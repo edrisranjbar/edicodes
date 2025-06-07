@@ -50,7 +50,7 @@ class Donation extends Model
     {
         $statusMap = [
             'pending' => 'در انتظار پرداخت',
-            'successful' => 'موفق',
+            'paid' => 'موفق',
             'failed' => 'ناموفق',
         ];
         
@@ -63,9 +63,9 @@ class Donation extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeSuccessful($query)
+    public function scopePaid($query)
     {
-        return $query->where('status', 'successful');
+        return $query->where('status', 'paid');
     }
     
     /**
