@@ -75,14 +75,14 @@ class PageView extends Model
 
     public function scopeUniqueVisitors($query)
     {
-        // This works with SQLite by using the count with a subquery
-        return $query->select(DB::raw('COUNT(DISTINCT ip_address) as count'));
+        // Use both IP address and user agent to better identify unique visitors
+        return $query->select(DB::raw('COUNT(DISTINCT CONCAT(ip_address, user_agent)) as count'));
     }
 
     public function scopeUniqueVisitorsCount($query)
     {
-        // Get unique visitors count for SQLite
-        $result = $query->select(DB::raw('COUNT(DISTINCT ip_address) as count'))->first();
+        // Get unique visitors count using both IP and user agent
+        $result = $query->select(DB::raw('COUNT(DISTINCT CONCAT(ip_address, user_agent)) as count'))->first();
         return $result ? $result->count : 0;
     }
 
