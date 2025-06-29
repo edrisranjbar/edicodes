@@ -15,9 +15,20 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Post::with('category')
-            ->published()
-            ->latest('published_at');
+        $query = Post::with('category');
+        
+        // Check if this is an admin request (authenticated) or public request
+        if ($request->user()) {
+            // Admin request - show all posts unless status is specified
+            if ($request->has('status') && $request->status === 'published') {
+                $query->published();
+            }
+        } else {
+            // Public request - always show only published posts
+            $query->published();
+        }
+        
+        $query->latest('published_at');
         
         // Filter by category
         if ($request->has('category')) {
@@ -77,6 +88,11 @@ class PostController extends Controller
      */
     public function show(Request $request, Post $post)
     {
+        // For public requests, only allow access to published posts
+        if (!$request->user() && !$post->published) {
+            abort(404);
+        }
+        
         // Record the page view
         $post->recordView($request);
         
