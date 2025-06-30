@@ -11,7 +11,7 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <!-- Project 1 -->
         <div class="bg-black/40 rounded-xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-200 group">
           <div class="relative overflow-hidden aspect-video">
@@ -113,6 +113,72 @@
               <div class="flex space-x-2">
                 <a 
                   href="https://github.com/edrisranjbar/mypassmaker" 
+                  target="_blank" 
+                  class="text-white/60 hover:text-white transition-colors"
+                >
+                  <font-awesome-icon :icon="['fab', 'github']" size="lg" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 3 - Morse Magic -->
+        <div class="bg-black/40 rounded-xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-200 group">
+          <div class="relative overflow-hidden aspect-video">
+            <svg 
+              class="w-full h-full bg-black/40" 
+              xmlns="http://www.w3.org/2000/svg" 
+              viewBox="0 0 800 450" 
+              preserveAspectRatio="xMidYMid slice"
+            >
+              <rect width="100%" height="100%" fill="#1a1a2e" />
+              <g transform="translate(400, 225)">
+                <text 
+                  text-anchor="middle" 
+                  dy=".3em" 
+                  fill="#ffffff" 
+                  font-family="Arial, sans-serif" 
+                  font-size="28" 
+                  font-weight="bold"
+                >
+                  مورس مجیک - ابزار یادگیری و تبدیل متن به کد مورس و بالعکس
+                </text>
+                <text 
+                  text-anchor="middle" 
+                  dy="2em" 
+                  fill="#10b981" 
+                  font-family="Arial, sans-serif" 
+                  font-size="16"
+                >
+                  ••• --- •••
+                </text>
+              </g>
+            </svg>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+            <div class="absolute bottom-0 right-0 p-3">
+              <span class="bg-primary text-white text-xs px-2 py-1 rounded">پایتون </span>
+              <span class="bg-gray-800 text-white text-xs px-2 py-1 rounded mr-1">کتابخانه </span>
+              <span class="bg-gray-800 text-white text-xs px-2 py-1 rounded mr-1">مورس </span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-white mb-2">کتابخانه پایتون مورس مجیک</h3>
+            <p class="text-white/70 mb-4 line-clamp-3">
+              ابزار قدرتمند برای تبدیل متن به کد مورس و بالعکس. قابلیت‌های پیشرفته شامل پخش صوتی، تنظیم سرعت، پشتیبانی از کاراکترهای خاص و رابط گرافیکی کاربرپسند.
+            </p>
+            <div class="flex justify-between items-center">
+              <a 
+                href="https://edrisranjbar.github.io/morse-magic/" 
+                target="_blank" 
+                class="text-primary hover:text-primary-dark transition-colors flex items-center"
+              >
+                <span>مشاهده پروژه</span>
+                <font-awesome-icon icon="arrow-left" class="mr-1" />
+              </a>
+              <div class="flex space-x-2">
+                <a 
+                  href="https://github.com/edrisranjbar/morse-magic" 
                   target="_blank" 
                   class="text-white/60 hover:text-white transition-colors"
                 >
