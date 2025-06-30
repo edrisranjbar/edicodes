@@ -157,13 +157,11 @@
             </svg>
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
             <div class="absolute bottom-0 right-0 p-3">
-              <span class="bg-primary text-white text-xs px-2 py-1 rounded">پایتون </span>
-              <span class="bg-gray-800 text-white text-xs px-2 py-1 rounded mr-1">کتابخانه </span>
-              <span class="bg-gray-800 text-white text-xs px-2 py-1 rounded mr-1">مورس </span>
+              <span class="bg-primary text-white text-xs px-2 py-1 rounded">وب سایت</span>
             </div>
           </div>
           <div class="p-6">
-            <h3 class="text-xl font-bold text-white mb-2">کتابخانه پایتون مورس مجیک</h3>
+            <h3 class="text-xl font-bold text-white mb-2">مورس مجیک</h3>
             <p class="text-white/70 mb-4 line-clamp-3">
               ابزار قدرتمند برای تبدیل متن به کد مورس و بالعکس. قابلیت‌های پیشرفته شامل پخش صوتی، تنظیم سرعت، پشتیبانی از کاراکترهای خاص و رابط گرافیکی کاربرپسند.
             </p>
