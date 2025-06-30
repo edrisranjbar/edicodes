@@ -126,35 +126,11 @@
         <!-- Project 3 - Morse Magic -->
         <div class="bg-black/40 rounded-xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-200 group">
           <div class="relative overflow-hidden aspect-video">
-            <svg 
-              class="w-full h-full bg-black/40" 
-              xmlns="http://www.w3.org/2000/svg" 
-              viewBox="0 0 800 450" 
-              preserveAspectRatio="xMidYMid slice"
-            >
-              <rect width="100%" height="100%" fill="#1a1a2e" />
-              <g transform="translate(400, 225)">
-                <text 
-                  text-anchor="middle" 
-                  dy=".3em" 
-                  fill="#ffffff" 
-                  font-family="Arial, sans-serif" 
-                  font-size="28" 
-                  font-weight="bold"
-                >
-                  مورس مجیک - ابزار یادگیری و تبدیل متن به کد مورس و بالعکس
-                </text>
-                <text 
-                  text-anchor="middle" 
-                  dy="2em" 
-                  fill="#10b981" 
-                  font-family="Arial, sans-serif" 
-                  font-size="16"
-                >
-                  ••• --- •••
-                </text>
-              </g>
-            </svg>
+            <img 
+              src="/projects/morse-magic.webp" 
+              alt="مورس مجیک - ابزار یادگیری و تبدیل متن به کد مورس و بالعکس" 
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
             <div class="absolute bottom-0 right-0 p-3">
               <span class="bg-primary text-white text-xs px-2 py-1 rounded">وب سایت</span>
@@ -213,6 +189,7 @@
 
 .line-clamp-3 {
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
