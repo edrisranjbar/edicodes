@@ -26,7 +26,7 @@ use App\Http\Controllers\Api\PageViewController;
 
 // Admin Authentication Routes
 Route::prefix('admin')->group(function () {
-    Route::post('/login', [AdminAuthController::class, 'login']);
+    Route::post('/login', [AdminAuthController::class, 'login'])->middleware('throttle:10,60');
     
     // Protected admin routes
     Route::middleware(['auth:sanctum'])->group(function () {
