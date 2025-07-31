@@ -76,9 +76,7 @@ Route::prefix('admin')->group(function () {
 });
 
 // Contact Form Endpoint
-Route::post('/contact', [ContactController::class, 'store']);
-// Alternative endpoint to avoid ad-blockers
-Route::post('/send-message', [ContactController::class, 'store']);
+Route::post('/send-message', [ContactController::class, 'store'])->middleware('throttle:2,60');
 
 // Donation Endpoints
 Route::post('/donations/pay', [DonationController::class, 'pay']);
@@ -104,7 +102,7 @@ Route::apiResource('posts', \App\Http\Controllers\Api\PostController::class)->on
 Route::get('posts/slug/{slug}', [\App\Http\Controllers\Api\PostController::class, 'findBySlug']); 
 
 // Comment Routes
-Route::post('/comments', [CommentController::class, 'store']);
+Route::post('/comments', [CommentController::class, 'store'])->middleware('throttle:3,5');
 Route::get('/posts/{post}/comments', [CommentController::class, 'postComments']);
 
 // Record a page view (for manual tracking if needed)
