@@ -162,6 +162,47 @@
             </div>
           </div>
         </div>
+
+      <!-- Project 4 - Coolping -->
+      <div class="bg-black/40 rounded-xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-200 group">
+        <div class="relative overflow-hidden aspect-video">
+          <img 
+            src="/projects/coolping.png" 
+            alt="Coolping - ابزار تست پینگ و بررسی تاخیر شبکه" 
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+          <div class="absolute bottom-0 right-0 p-3">
+            <span class="bg-primary text-white text-xs px-2 py-1 rounded">لینوکسی </span>
+            <span class="bg-gray-800 text-white text-xs px-2 py-1 rounded mr-1">کتابخانه </span>
+          </div>
+        </div>
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-white mb-2">ابزار ترمینال coolping</h3>
+          <p class="text-white/70 mb-4 line-clamp-3">
+            ابزار ساده و باحال برای تست پینگ و بررسی تاخیر شبکه. مناسب برای برنامه نویس ها، سیستم ادمین ها و کاربران حرفه‌ای جهت مانیتورینگ وضعیت اتصال اینترنت.
+          </p>
+          <div class="flex justify-between items-center">
+            <a 
+              href="https://edrisranjbar.github.io/coolping/" 
+              target="_blank" 
+              class="text-primary hover:text-primary-dark transition-colors flex items-center"
+            >
+              <span>مشاهده پروژه</span>
+              <font-awesome-icon icon="arrow-left" class="mr-1" />
+            </a>
+            <div class="flex space-x-2">
+              <a 
+                href="https://github.com/edrisranjbar/coolping" 
+                target="_blank" 
+                class="text-white/60 hover:text-white transition-colors"
+              >
+                <font-awesome-icon :icon="['fab', 'github']" size="lg" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
 
       <div class="text-center mt-12">
