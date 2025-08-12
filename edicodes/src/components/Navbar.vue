@@ -44,9 +44,9 @@
             یوتیوب
           </router-link>
           <router-link 
-            to="/#donate" 
+            to="/donation" 
             class="nav-link" 
-            :class="{ 'active': $route.hash === '#donate' }"
+            :class="{ 'active': $route.path === '/donation' }"
           >
             <font-awesome-icon icon="heart" class="ml-1.5" />
             حمایت
@@ -100,7 +100,7 @@
             <font-awesome-icon :icon="['fab', 'youtube']" class="ml-2" />
             یوتیوب
           </router-link>
-          <router-link to="/#donate" class="mobile-nav-link" @click="isOpen = false">
+          <router-link to="/donation" class="mobile-nav-link" @click="isOpen = false">
             <font-awesome-icon icon="heart" class="ml-2" />
             حمایت
           </router-link>
