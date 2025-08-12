@@ -57,6 +57,20 @@
         <!-- Post Content -->
         <div class="prose prose-invert prose-lg max-w-none font-vazir blog-content" v-html="post.content"></div>
 
+        <!-- Donation Box -->
+        <div class="mt-10 p-6 bg-black/40 rounded-2xl border border-white/10 text-center">
+          <p class="mb-4 text-white/80 font-vazir">
+            اگر این محتوا برای شما مفید بود، با حمایت مالی به تولید محتوای رایگان کمک کنید.
+          </p>
+          <router-link
+            to="/donation"
+            class="inline-flex items-center gap-2 px-5 py-2 bg-primary/20 text-primary hover:bg-primary/30 rounded-lg transition-colors duration-200 font-vazir"
+          >
+            <font-awesome-icon icon="heart" />
+            <span>حمایت از محتوای رایگان</span>
+          </router-link>
+        </div>
+
         <!-- Post Footer -->
         <footer class="mt-12 pt-8 border-t border-white/10">
           <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
