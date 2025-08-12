@@ -118,33 +118,46 @@
         <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
       </div>
 
-      <div v-else class="overflow-x-auto">
-        <table class="w-full">
-          <thead>
-            <tr class="text-right border-b border-white/10">
-              <th class="py-3 pr-3 text-sm font-vazir text-white/60 font-normal">بازدید کل</th>
-              <th class="py-3 px-3 text-sm font-vazir text-white/60 font-normal">بازدیدکنندگان منحصر به فرد</th>
-              <th class="py-3 px-3 text-sm font-vazir text-white/60 font-normal">بازدید امروز</th>
-              <th class="py-3 pl-3 text-sm font-vazir text-white/60 font-normal">بازدید هفته</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="text-right border-b border-white/5 hover:bg-white/5">
-              <td class="py-4 pr-3">
-                <div class="font-vazir text-white text-lg">{{ stats.views.total || 0 }}</div>
-              </td>
-              <td class="py-4 px-3">
-                <div class="font-vazir text-white text-lg">{{ stats.views.unique || 0 }}</div>
-              </td>
-              <td class="py-4 px-3">
-                <div class="font-vazir text-white text-lg">{{ stats.views.today || 0 }}</div>
-              </td>
-              <td class="py-4 pl-3">
-                <div class="font-vazir text-white text-lg">{{ stats.views.week || 0 }}</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-else>
+        <!-- Weekly views mini chart -->
+        <div class="h-64 mb-6">
+          <div v-if="!analytics.dailyViews || analytics.dailyViews.length === 0" class="text-center py-6 text-white/50 font-vazir">
+            داده‌ای برای نمایش نمودار وجود ندارد.
+          </div>
+          <div v-else class="h-full">
+            <LineChart :data="chartData" :options="chartOptions" />
+          </div>
+        </div>
+
+        <!-- Summary table -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="text-right border-b border-white/10">
+                <th class="py-3 pr-3 text-sm font-vazir text-white/60 font-normal">بازدید کل</th>
+                <th class="py-3 px-3 text-sm font-vazir text-white/60 font-normal">بازدیدکنندگان منحصر به فرد</th>
+                <th class="py-3 px-3 text-sm font-vazir text-white/60 font-normal">بازدید امروز</th>
+                <th class="py-3 pl-3 text-sm font-vazir text-white/60 font-normal">بازدید هفته</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-right border-b border-white/5 hover:bg-white/5">
+                <td class="py-4 pr-3">
+                  <div class="font-vazir text-white text-lg">{{ stats.views.total || 0 }}</div>
+                </td>
+                <td class="py-4 px-3">
+                  <div class="font-vazir text-white text-lg">{{ stats.views.unique || 0 }}</div>
+                </td>
+                <td class="py-4 px-3">
+                  <div class="font-vazir text-white text-lg">{{ stats.views.today || 0 }}</div>
+                </td>
+                <td class="py-4 pl-3">
+                  <div class="font-vazir text-white text-lg">{{ stats.views.week || 0 }}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -316,9 +329,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { API_URL } from '@/config';
+import { Line as LineChart } from 'vue-chartjs'
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
+import moment from 'moment-jalaali'
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const loading = ref(true);
 const stats = ref({
@@ -343,6 +361,107 @@ const recentDonations = ref({
   error: null,
   data: []
 });
+
+// --- Analytics mini chart state ---
+const analytics = ref({ dailyViews: [] })
+
+const toPersianDigits = (str) => {
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
+  return str.toString().replace(/[0-9]/g, (w) => persianDigits[+w])
+}
+
+const formatChartLabel = (dateString) => {
+  const date = moment(dateString)
+  const day = toPersianDigits(date.format('jD'))
+  const monthNames = {
+    'Farvardin': 'فروردین',
+    'Ordibehesht': 'اردیبهشت',
+    'Khordad': 'خرداد',
+    'Tir': 'تیر',
+    'Mordad': 'مرداد',
+    'Shahrivar': 'شهریور',
+    'Mehr': 'مهر',
+    'Aban': 'آبان',
+    'Azar': 'آذر',
+    'Dey': 'دی',
+    'Bahman': 'بهمن',
+    'Esfand': 'اسفند'
+  }
+  const month = monthNames[date.format('jMMMM')]
+  return `${day} ${month}`
+}
+
+const chartData = computed(() => {
+  const labels = analytics.value.dailyViews?.map(item => formatChartLabel(item.date)) || []
+  const views = analytics.value.dailyViews?.map(item => item.views) || []
+  const uniques = analytics.value.dailyViews?.map(item => item.unique_visitors) || []
+
+  return {
+    labels,
+    datasets: [
+      {
+        label: 'بازدیدها',
+        data: views,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+        tension: 0.4,
+        fill: true
+      },
+      {
+        label: 'بازدیدکنندگان منحصر به فرد',
+        data: uniques,
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        tension: 0.4,
+        fill: true
+      }
+    ]
+  }
+})
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top',
+      labels: {
+        font: { family: 'Vazirmatn' },
+        color: 'rgba(255, 255, 255, 0.7)'
+      }
+    },
+    tooltip: {
+      mode: 'index',
+      intersect: false,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      titleColor: '#fff',
+      bodyColor: '#fff',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      borderWidth: 1,
+      callbacks: {
+        label: (context) => {
+          const label = context.dataset.label || ''
+          const value = context.parsed.y
+          return `${label}: ${toPersianDigits(value)}`
+        }
+      }
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      grid: { color: 'rgba(255, 255, 255, 0.1)' },
+      ticks: {
+        color: 'rgba(255, 255, 255, 0.7)',
+        callback: (value) => toPersianDigits(value)
+      }
+    },
+    x: {
+      grid: { color: 'rgba(255, 255, 255, 0.1)' },
+      ticks: { color: 'rgba(255, 255, 255, 0.7)', maxRotation: 45, minRotation: 45 }
+    }
+  }
+}
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -391,6 +510,12 @@ const fetchDashboardData = async () => {
     
     // Update recent posts from dashboard data
     recentPosts.value = response.data.recentPosts || [];
+
+    // Fetch weekly analytics mini series
+    const analyticsRes = await axios.get(`${API_URL}/admin/analytics?period=week`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    analytics.value = analyticsRes.data || { dailyViews: [] }
   } catch (err) {
     console.error('Error fetching dashboard data:', err);
   } finally {
