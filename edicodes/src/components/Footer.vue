@@ -27,7 +27,7 @@
               </router-link>
             </li>
             <li>
-              <router-link to="/#donate" class="text-white/70 hover:text-white transition-colors duration-200 text-sm font-vazir flex items-center gap-2">
+              <router-link to="/donation" class="text-white/70 hover:text-white transition-colors duration-200 text-sm font-vazir flex items-center gap-2">
                 <font-awesome-icon icon="heart" class="w-4 h-4" />
                 حمایت
               </router-link>
