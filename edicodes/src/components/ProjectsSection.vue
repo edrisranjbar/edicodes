@@ -203,6 +203,53 @@
           </div>
         </div>
       </div>
+      <!-- Project 5 - Quran Radio -->
+      <div class="bg-black/40 rounded-xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-200 group">
+        <div class="relative overflow-hidden aspect-video">
+          <img 
+            src="/projects/quran-radio.png" 
+            alt="رادیو قرآن - پخش زنده قرآن کریم" 
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+          <div class="absolute bottom-0 right-0 p-3">
+            <span class="bg-primary text-white text-xs px-2 py-1 rounded">وب اپلیکیشن</span>
+            <span class="bg-gray-800 text-white text-xs px-2 py-1 rounded mr-1">استریم صوتی</span>
+          </div>
+        </div>
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-white mb-2">رادیو قرآن</h3>
+          <p class="text-white/70 mb-4 line-clamp-3">
+            پخش زنده تلاوت قرآن کریم و دسترسی به ایستگاه‌های قرآنی با رابط کاربری ساده و سبک. مناسب برای شنیدن تلاوت‌ها و برنامه‌های قرآنی به صورت آنلاین.
+          </p>
+          <div class="flex justify-between items-center">
+            <a 
+              href="https://online-nour-cast.ir/" 
+              target="_blank" 
+              class="text-primary hover:text-primary-dark transition-colors flex items-center"
+            >
+              <span>مشاهده پروژه</span>
+              <font-awesome-icon icon="arrow-left" class="mr-1" />
+            </a>
+            <div class="flex items-center gap-4">
+              <a 
+                href="https://github.com/edrisranjbar/quran-radio" 
+                target="_blank" 
+                class="text-white/60 hover:text-white transition-colors"
+              >
+                <font-awesome-icon :icon="['fab', 'github']" size="lg" />
+              </a>
+              <a 
+                href="https://online-nour-cast.ir/"
+                target="_blank" 
+                class="text-white/60 hover:text-white transition-colors"
+              >
+                <font-awesome-icon icon="globe" size="lg" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
 
       <div class="text-center mt-12">
