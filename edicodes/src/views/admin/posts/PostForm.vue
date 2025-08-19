@@ -88,16 +88,14 @@
           
           <div>
             <label for="content" class="block text-white font-vazir mb-2">متن مطلب</label>
-            <p class="text-white/50 text-xs mb-2 font-vazir">
-              متن مطلب را به صورت HTML وارد کنید. از تگ‌های p، h2، ul، li و... استفاده کنید.
+            <p class="text-white/50 text-xs mb-3 font-vazir">
+              ویرایشگر بلوکی مدرن با پشتیبانی از عناوین، فهرست، نقل‌قول، تصاویر، ویدیو، لینک و بلوک‌های کد. خروجی HTML برای سازگاری با مطالب قدیمی حفظ می‌شود.
             </p>
-            <textarea 
-              v-model="post.content" 
-              id="content" 
-              rows="20"
-              class="w-full bg-black/20 border border-white/10 rounded-lg py-2 px-4 font-vazir text-white/90 focus:outline-none focus:border-primary/50"
-              placeholder="<p>متن مطلب را اینجا وارد کنید...</p>"
-            ></textarea>
+            <BlockEditor
+              v-model="post.content"
+              :upload-url="uploadEndpoint"
+              :auth-token="adminToken"
+            />
           </div>
         </div>
       </div>
@@ -223,6 +221,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import FileUploader from '@/components/admin/FileUploader.vue';
+import BlockEditor from '@/components/admin/BlockEditor.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -235,6 +234,7 @@ const categories = ref([]);
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 const adminApiUrl = computed(() => `${apiUrl}/admin`);
 const uploadEndpoint = computed(() => `${adminApiUrl.value}/upload/image`);
+const adminToken = localStorage.getItem('admin_token') || '';
 
 // Form state
 const post = ref({
