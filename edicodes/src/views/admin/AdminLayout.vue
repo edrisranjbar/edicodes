@@ -121,6 +121,12 @@ const pageTitle = computed(() => {
     case 'admin-categories-create': return 'ایجاد دسته‌بندی جدید';
     case 'admin-categories-edit': return 'ویرایش دسته‌بندی';
     case 'admin-donations': return 'مدیریت حمایت‌های مالی';
+    case 'admin-courses': return 'مدیریت دوره‌ها';
+    case 'admin-courses-create': return 'ایجاد دوره جدید';
+    case 'admin-courses-edit': return 'ویرایش دوره';
+    case 'admin-courses-contents': return 'مدیریت محتوای دوره';
+    case 'admin-students': return 'مدیریت دانشجویان';
+    case 'admin-enrollments': return 'مدیریت ثبت‌نام‌ها';
     case 'admin-settings': return 'تنظیمات حساب کاربری';
     default: return 'پنل مدیریت';
   }

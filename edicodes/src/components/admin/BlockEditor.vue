@@ -137,7 +137,10 @@ onMounted(() => {
       }
     },
     onUpdate: ({ editor }) => {
-      emit('update:modelValue', editor.getHTML())
+      // Ensure HTML inside <pre><code> is escaped so browser doesn't parse and strip it
+      const html = editor.getHTML()
+      const escaped = escapeHtmlInsideCodeBlocks(html)
+      emit('update:modelValue', escaped)
     }
   })
 })
@@ -253,6 +256,27 @@ function embedVideoUrl() {
 
 function insertTable() {
   editor.value?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+}
+
+// Escapes inner HTML of code blocks to preserve raw code (e.g., <div> becomes &lt;div&gt;)
+function escapeHtmlInsideCodeBlocks(html) {
+  try {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, 'text/html')
+    doc.querySelectorAll('pre code').forEach((codeEl) => {
+      // If code element contains any element children (e.g., spans, divs),
+      // convert its innerHTML to text so tags are escaped.
+      const hasElementChild = Array.from(codeEl.childNodes).some((n) => n.nodeType === 1)
+      if (hasElementChild) {
+        const raw = codeEl.innerHTML
+        codeEl.textContent = raw
+      }
+    })
+    return doc.body.innerHTML
+  } catch (_) {
+    // Fallback: return original if DOMParser is not available
+    return html
+  }
 }
 </script>
 

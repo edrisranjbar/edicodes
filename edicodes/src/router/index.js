@@ -105,6 +105,40 @@ const router = createRouter({
           path: 'settings',
           name: 'admin-settings',
           component: () => import('@/views/admin/settings/Index.vue')
+        },
+        // Course Management Routes
+        {
+          path: 'courses',
+          name: 'admin-courses',
+          component: () => import('@/views/admin/courses/CoursesList.vue')
+        },
+        {
+          path: 'courses/create',
+          name: 'admin-courses-create',
+          component: () => import('@/views/admin/courses/CourseForm.vue')
+        },
+        {
+          path: 'courses/edit/:id',
+          name: 'admin-courses-edit',
+          component: () => import('@/views/admin/courses/CourseForm.vue'),
+          props: true
+        },
+        {
+          path: 'courses/:id/contents',
+          name: 'admin-courses-contents',
+          component: () => import('@/views/admin/courses/CourseContents.vue'),
+          props: true
+        },
+        // Student/Enrollment Management Routes
+        {
+          path: 'students',
+          name: 'admin-students',
+          component: () => import('@/views/admin/students/StudentsList.vue')
+        },
+        {
+          path: 'enrollments',
+          name: 'admin-enrollments',
+          component: () => import('@/views/admin/students/EnrollmentsList.vue')
         }
       ]
     },

@@ -46,6 +46,33 @@
     </router-link>
     
     <router-link 
+      to="/admin/courses"
+      :class="[$route.path.startsWith('/admin/courses') ? 'bg-primary/20 text-primary' : '']" 
+      class="flex items-center py-2 px-3 text-sm text-white/90 rounded-lg hover:bg-white/5 transition-colors duration-150 font-vazir"
+    >
+      <font-awesome-icon icon="graduation-cap" class="ml-2 h-5 w-5" />
+      مدیریت دوره‌ها
+    </router-link>
+    
+    <router-link 
+      to="/admin/students"
+      :class="[$route.path.startsWith('/admin/students') ? 'bg-primary/20 text-primary' : '']" 
+      class="flex items-center py-2 px-3 text-sm text-white/90 rounded-lg hover:bg-white/5 transition-colors duration-150 font-vazir"
+    >
+      <font-awesome-icon icon="users" class="ml-2 h-5 w-5" />
+      مدیریت دانشجویان
+    </router-link>
+    
+    <router-link 
+      to="/admin/enrollments"
+      :class="[$route.path.startsWith('/admin/enrollments') ? 'bg-primary/20 text-primary' : '']" 
+      class="flex items-center py-2 px-3 text-sm text-white/90 rounded-lg hover:bg-white/5 transition-colors duration-150 font-vazir"
+    >
+      <font-awesome-icon icon="user-graduate" class="ml-2 h-5 w-5" />
+      ثبت‌نام‌ها
+    </router-link>
+    
+    <router-link 
       to="/admin/donations" 
       :class="[$route.path.startsWith('/admin/donations') ? 'bg-primary/20 text-primary' : '']"
       class="flex items-center py-2 px-3 text-sm text-white/90 rounded-lg hover:bg-white/5 transition-colors duration-150 font-vazir"

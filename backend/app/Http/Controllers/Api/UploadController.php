@@ -60,4 +60,64 @@ class UploadController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Upload a course thumbnail
+     */
+    public function uploadCourseThumbnail(Request $request)
+    {
+        try {
+            $request->validate([
+                'thumbnail' => 'required|file|image|mimes:jpg,jpeg,png,webp|max:10240', // 10MB max
+            ]);
+
+            if (!$request->hasFile('thumbnail')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'فایل تصویر انتخاب نشده است'
+                ], 400);
+            }
+            
+            $file = $request->file('thumbnail');
+            
+            if (!$file->isValid()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'فایل نامعتبر است: ' . $file->getErrorMessage()
+                ], 400);
+            }
+            
+            $extension = $file->getClientOriginalExtension();
+            $filename = 'course_thumbnail_' . Str::uuid() . '.' . $extension;
+            
+            // Store in the public disk under uploads/courses/thumbnails folder
+            $path = $file->storeAs('uploads/courses/thumbnails', $filename, 'public');
+            
+            if (!$path) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'خطا در ذخیره فایل'
+                ], 500);
+            }
+            
+            // Return the full URL to the uploaded file
+            $url = asset('storage/' . $path);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'تصویر با موفقیت آپلود شد',
+                'data' => [
+                    'url' => $url,
+                    'path' => $path,
+                    'filename' => $filename
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Course thumbnail upload error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در آپلود تصویر: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 } 

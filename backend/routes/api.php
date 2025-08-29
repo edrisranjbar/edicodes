@@ -12,6 +12,11 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\PageViewController;
+use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\CourseContentController;
+use App\Http\Controllers\Api\EnrollmentController;
+use App\Http\Controllers\Api\VideoStreamController;
+use App\Http\Controllers\Api\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,57 +29,6 @@ use App\Http\Controllers\Api\PageViewController;
 |
 */
 
-// Admin Authentication Routes
-Route::prefix('admin')->group(function () {
-    Route::post('/login', [AdminAuthController::class, 'login'])->middleware('throttle:10,60');
-    
-    // Protected admin routes
-    Route::middleware(['auth:sanctum'])->group(function () {
-        Route::post('/logout', [AdminAuthController::class, 'logout']);
-        Route::get('/profile', [AdminAuthController::class, 'profile']);
-        Route::post('/change-password', [AdminAuthController::class, 'changePassword']);
-        Route::post('/update-profile', [AdminAuthController::class, 'updateProfile']);
-        Route::post('/upload/image', [UploadController::class, 'uploadImage']);
-        
-        // Dashboard
-        Route::get('/dashboard', [DashboardController::class, 'index']);
-        
-        // Donations
-        Route::get('/donations', [DonationController::class, 'index'])->name('admin.donations.index');
-        
-        // Blog Management Routes
-        Route::apiResource('categories', CategoryController::class)
-            ->names([
-                'index' => 'admin.categories.index',
-                'store' => 'admin.categories.store',
-                'show' => 'admin.categories.show',
-                'update' => 'admin.categories.update',
-                'destroy' => 'admin.categories.destroy',
-            ]);
-            
-        Route::apiResource('posts', PostController::class)
-            ->names([
-                'index' => 'admin.posts.index',
-                'store' => 'admin.posts.store',
-                'show' => 'admin.posts.show',
-                'update' => 'admin.posts.update',
-                'destroy' => 'admin.posts.destroy',
-            ]);
-            
-        // Comment Management Routes
-        Route::get('/comments', [CommentController::class, 'index']);
-        Route::get('/comments/{comment}', [CommentController::class, 'show']);
-        Route::put('/comments/{comment}', [CommentController::class, 'update']);
-        Route::patch('/comments/{comment}/status', [CommentController::class, 'updateStatus']);
-        Route::post('/comments/{comment}/reply', [CommentController::class, 'adminReply']);
-        Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
-
-        // Analytics Routes
-        Route::get('/analytics', [PageViewController::class, 'getAnalytics']);
-        Route::get('/posts/{postId}/analytics', [PageViewController::class, 'getPostAnalytics']);
-    });
-});
-
 // Contact Form Endpoint
 Route::post('/send-message', [ContactController::class, 'store'])->middleware('throttle:2,60');
 
@@ -85,6 +39,34 @@ Route::get('/donations/verify', [DonationController::class, 'verify'])->name('do
 // Test Resend Email (only in local/development environment)
 if (app()->environment(['local', 'development'])) {
     Route::get('/test-email', [TestResendController::class, 'testEmail']);
+    
+    // Payment Test Routes (Development Only)
+    Route::prefix('test')->group(function () {
+        Route::get('/payment/methods', [PaymentController::class, 'getPaymentMethods']);
+        Route::post('/payment/create-test-enrollment', function() {
+            // Create a test enrollment for testing payments
+            $course = \App\Models\Course::first();
+            $user = \App\Models\User::first();
+            
+            if (!$course || !$user) {
+                return response()->json(['error' => 'No course or user found'], 400);
+            }
+            
+            $enrollment = \App\Models\Enrollment::create([
+                'user_id' => $user->id,
+                'course_id' => $course->id,
+                'amount_paid' => 1000, // 1000 Toman
+                'payment_status' => 'pending',
+                'enrolled_at' => now()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'enrollment' => $user->id,
+                'message' => 'Test enrollment created'
+            ]);
+        });
+    });
 }
 
 // Health Check Endpoint
@@ -108,3 +90,33 @@ Route::get('/posts/{post}/comments', [CommentController::class, 'postComments'])
 // Record a page view (for manual tracking if needed)
 Route::post('/posts/{postId}/view', [PageViewController::class, 'recordPostView']);
 Route::post('/page-view', [PageViewController::class, 'recordGenericPageView']);
+
+// Public Course Routes
+Route::apiResource('courses', CourseController::class)->only(['index', 'show']);
+Route::get('courses/slug/{course:slug}', [CourseController::class, 'show']);
+
+// Payment Callback (Public - called by payment gateway)
+Route::post('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+
+// Protected Course Routes (require authentication)
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Course Content Access
+    Route::get('/courses/{course}/contents/{content}', [CourseController::class, 'getContent']);
+    Route::get('/courses/{course}/contents/{content}/video', [VideoStreamController::class, 'stream'])->name('api.courses.video');
+    
+    // Enrollment Routes
+    Route::get('/enrollments', [EnrollmentController::class, 'index']);
+    Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
+    Route::post('/enrollments/{enrollment}/payment', [EnrollmentController::class, 'processPayment']);
+    Route::get('/enrollments/{enrollment}/verify', [EnrollmentController::class, 'verifyPayment']);
+    Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'cancel']);
+    
+    // Payment Routes
+    Route::get('/payment/methods', [PaymentController::class, 'getPaymentMethods']);
+    Route::post('/enrollments/{enrollment}/create-payment', [PaymentController::class, 'createPayment']);
+    Route::get('/enrollments/{enrollment}/payment-status', [PaymentController::class, 'checkStatus']);
+    Route::post('/enrollments/{enrollment}/refund', [PaymentController::class, 'refund']);
+    
+
+});
+

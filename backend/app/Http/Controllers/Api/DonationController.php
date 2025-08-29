@@ -249,7 +249,7 @@ class DonationController extends Controller
     
     /**
      * Return error response for payment
-     * 
+     *
      * @param string $message
      * @param Donation|null $donation
      * @return \Illuminate\Http\Response
@@ -260,7 +260,7 @@ class DonationController extends Controller
             'success' => false,
             'message' => $message
         ];
-        
+
         if ($donation) {
             $response['donation'] = [
                 'id' => $donation->id,
@@ -268,7 +268,158 @@ class DonationController extends Controller
                 'status' => $donation->status_in_persian,
             ];
         }
-        
+
         return response()->json($response);
+    }
+
+    /**
+     * Get all donations for admin (admin interface).
+     */
+    public function adminIndex(Request $request)
+    {
+        // Set default params and get request params
+        $perPage = $request->input('per_page', 15);
+        $status = $request->input('status', 'all');
+        $sort = $request->input('sort', '-created_at');
+
+        // Start query
+        $query = Donation::query();
+
+        // Apply status filter if specified
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        // Apply date range filter if specified
+        if ($request->has('start_date') && $request->start_date) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+
+        if ($request->has('end_date') && $request->end_date) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
+
+        // Apply sorting
+        if ($sort) {
+            $direction = 'asc';
+            if (str_starts_with($sort, '-')) {
+                $direction = 'desc';
+                $sort = substr($sort, 1);
+            }
+            $query->orderBy($sort, $direction);
+        }
+
+        // Get paginated results
+        $donations = $query->paginate($perPage);
+
+        // Transform donation data with additional attributes
+        $donations->getCollection()->transform(function($donation) {
+            $donation->formatted_amount = $donation->formatted_amount;
+            $donation->status_in_persian = $donation->status_in_persian;
+            return $donation;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $donations
+        ]);
+    }
+
+    /**
+     * Get specific donation for admin.
+     */
+    public function adminShow(Donation $donation)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $donation->id,
+                'name' => $donation->name,
+                'email' => $donation->email,
+                'message' => $donation->message,
+                'amount' => $donation->amount,
+                'formatted_amount' => $donation->formatted_amount,
+                'currency' => $donation->currency,
+                'payment_method' => $donation->payment_method,
+                'status' => $donation->status,
+                'status_in_persian' => $donation->status_in_persian,
+                'transaction_id' => $donation->transaction_id,
+                'ref_id' => $donation->ref_id,
+                'ip_address' => $donation->ip_address,
+                'user_agent' => $donation->user_agent,
+                'created_at' => $donation->created_at,
+                'updated_at' => $donation->updated_at
+            ]
+        ]);
+    }
+
+    /**
+     * Update donation for admin.
+     */
+    public function adminUpdate(Request $request, Donation $donation)
+    {
+        $request->validate([
+            'status' => 'sometimes|in:pending,paid,failed',
+            'notes' => 'sometimes|string|max:1000'
+        ]);
+
+        try {
+            $updateData = $request->only(['status']);
+
+            $donation->update($updateData);
+
+            // Log admin action if notes provided
+            if ($request->has('notes')) {
+                Log::info('Donation updated by admin', [
+                    'donation_id' => $donation->id,
+                    'admin_id' => $request->user()->id ?? 'system',
+                    'changes' => $updateData,
+                    'notes' => $request->notes
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'کمک مالی با موفقیت به‌روزرسانی شد',
+                'data' => $donation->load('formatted_amount', 'status_in_persian')
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در به‌روزرسانی کمک مالی',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete donation for admin.
+     */
+    public function adminDestroy(Donation $donation)
+    {
+        try {
+            // Only allow deletion of pending donations
+            if ($donation->status === 'paid') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'نمی‌توان کمک مالی پرداخت شده را حذف کرد'
+                ], 400);
+            }
+
+            $donation->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'کمک مالی با موفقیت حذف شد'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در حذف کمک مالی',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
