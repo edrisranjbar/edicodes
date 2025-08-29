@@ -167,7 +167,7 @@
                 <span v-if="course.category && course.category.name" class="text-sm text-gray-300 font-vazir">
                   {{ course.category.name }}
                 </span>
-                <span v-else class="text-sm text-gray-500 font-vazir">بدون دسته</span>
+                <span v-else class="text-sm text-gray-300 font-vazir">بدون دسته</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
