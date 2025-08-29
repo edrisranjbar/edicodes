@@ -83,7 +83,7 @@ class Course extends Model
      */
     public function getRouteKeyName(): string
     {
-        return 'slug';
+        return 'id';
     }
 
     /**
