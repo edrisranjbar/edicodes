@@ -27,7 +27,9 @@ import {
   // Block menu icons
   faVideo, faMusic, faTable,
   // File uploader icon
-  faCloudUploadAlt, faUpload
+  faCloudUploadAlt, faUpload,
+  faFileLines,
+  faSignal, faStar, faFolderOpen
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faGithub, faYoutube, faLinkedin, faTwitter, faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -40,24 +42,17 @@ library.add(
   faCircleNotch, faCheckCircle, faInfoCircle, faGlobe, faArrowLeft, faRocket, faSearch, 
   faCalendar, faTwitter, faTelegram, faChevronDown,
   faChartLine, faEye, faUsers, faNewspaper,
-  // Admin icons
   faTachometerAlt, faNewspaper, faPlusCircle, faFolder, faPlus, faEdit, 
   faTrashAlt, faEye, faMagic, faSave, faLock, faSignOutAlt, faFolderPlus, faRss,
-  // Block editor icons
   faBold, faItalic, faUnderline, faHeading, faParagraph, faListUl, faListOl, 
   faAlignLeft, faAlignCenter, faAlignRight, faAlignJustify, faQuoteRight, faMinus, 
   faImage, faLink, faUnlink, faUndo, faRedo,
-  // Block menu icons
   faVideo, faMusic, faTable,
-  // File uploader icon
   faCloudUploadAlt, faUpload,
-  // Comment icons
   faUser, faComments, faCommentSlash, faReply, faClock,
-  // New icons
-  faDonate, faCog,
-  // Additional missing icons
+  faDonate, faCog, faStar, faSignal,
   faDownload, faGraduationCap, faList, faBan, faCheck, faUserGraduate, 
-  faMoneyBillWave, faUndo, faTrash, faArrowRight, faRedo
+  faMoneyBillWave, faUndo, faTrash, faArrowRight, faRedo, faFileLines, faFolderOpen
 )
 
 const app = createApp(App)

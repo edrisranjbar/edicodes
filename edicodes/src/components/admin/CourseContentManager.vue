@@ -324,7 +324,7 @@ const fetchContents = async () => {
 
 const getContentTypeIcon = (type) => {
   const typeMap = {
-    text: 'file-text',
+    text: 'file-lines',
     video: 'video',
     file: 'file'
   };

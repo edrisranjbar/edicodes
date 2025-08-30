@@ -1,42 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-900 text-white">
-      <!-- Header -->
-    <div class="bg-black/50 border-b border-white/10">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-          <div class="flex items-center space-x-4 space-x-reverse">
-            <button
-              @click="$router.go(-1)"
-              class="p-2 text-gray-400 hover:text-white transition-colors duration-200"
-            >
-              <font-awesome-icon icon="arrow-right" class="h-5 w-5" />
-            </button>
-            <h1 class="text-xl font-semibold font-vazir">مدیریت محتوای دوره</h1>
-          </div>
-          
-          <div class="flex items-center space-x-4 space-x-reverse">
-            <router-link
-              :to="{ name: 'admin-courses-edit', params: { id: courseId } }"
-              class="inline-flex items-center px-3 py-2 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors duration-200 font-vazir"
-            >
-              <font-awesome-icon icon="edit" class="ml-2 h-3 w-3" />
-              ویرایش دوره
-            </router-link>
-            
-            <router-link
-              :to="{ name: 'admin-courses' }"
-              class="inline-flex items-center px-3 py-2 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors duration-200 font-vazir"
-            >
-              <font-awesome-icon icon="list" class="ml-2 h-3 w-3" />
-              لیست دوره‌ها
-            </router-link>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
       <div v-if="loading" class="flex justify-center py-20">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
@@ -45,13 +10,13 @@
         <font-awesome-icon icon="exclamation-triangle" class="h-16 w-16 text-red-500 mx-auto mb-4" />
         <h2 class="text-xl font-semibold text-white mb-2 font-vazir">خطا در بارگذاری دوره</h2>
         <p class="text-gray-400 mb-4 font-vazir">{{ error }}</p>
-            <button
+          <button
           @click="fetchCourse"
           class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200 font-vazir"
             >
           تلاش مجدد
-            </button>
-          </div>
+          </button>
+      </div>
 
       <div v-else-if="course" class="space-y-6">
         <!-- Course Info Card -->
@@ -92,9 +57,9 @@
                   {{ course.students_count || 0 }} دانشجو
                 </span>
                 <span class="font-vazir">
-                  <font-awesome-icon icon="file-alt" class="ml-1 h-3 w-3" />
+                  <font-awesome-icon icon="file-lines" class="ml-1 h-3 w-3" />
                   {{ course.contents_count || 0 }} اپیزود
-                </span>
+              </span>
             </div>
 
               <!-- Course Status -->

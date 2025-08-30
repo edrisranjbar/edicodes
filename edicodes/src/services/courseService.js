@@ -118,18 +118,40 @@ const courseService = {
 
     // Check if we have a file to upload
     if (courseData.thumbnail instanceof File) {
-      // First, upload the thumbnail file separately
-      try {
-        const uploadResult = await this.uploadThumbnail(courseData.thumbnail);
-        // Replace the file with the uploaded path
-        courseData.thumbnail = uploadResult.data.path;
-      } catch (uploadError) {
-        throw new Error('Failed to upload thumbnail: ' + uploadError.message);
-      }
-    }
+      // Create FormData for file upload
+      const formData = new FormData();
 
-    // Now update the course with the thumbnail path
-    return instance.put(`/admin/courses/${id}`, courseData);
+      // Add all course data to FormData
+      Object.keys(courseData).forEach(key => {
+        if (key === 'thumbnail' && courseData[key] instanceof File) {
+          // Try appending with explicit filename and type
+          formData.append('thumbnail', courseData[key], courseData[key].name);
+        } else if (key !== 'thumbnail') {
+          const value = courseData[key];
+
+          // Handle different data types properly
+          if (typeof value === 'boolean') {
+            formData.append(key, value ? '1' : '0');
+          } else if (typeof value === 'number') {
+            formData.append(key, value.toString());
+          } else if (value === null || value === undefined) {
+            // For update operations, only include defined values
+            // Skip null/undefined to avoid overriding existing values unintentionally
+          } else {
+            formData.append(key, value);
+          }
+        }
+      });
+
+
+
+      // Don't set Content-Type header - let axios set it automatically for FormData
+
+      return instance.put(`/admin/courses/${id}`, formData);
+    } else {
+      // Regular JSON request
+      return instance.put(`/admin/courses/${id}`, courseData);
+    }
   },
 
   /**
