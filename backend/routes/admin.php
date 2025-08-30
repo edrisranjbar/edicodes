@@ -49,11 +49,14 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
     // Admin Course Content Management
     Route::get('/courses/{course}/contents', [\App\Http\Controllers\Api\CourseContentController::class, 'index']);
     Route::post('/courses/{course}/contents', [\App\Http\Controllers\Api\CourseContentController::class, 'store']);
+    Route::post('/courses/{course}/contents/with-file', [\App\Http\Controllers\Api\CourseContentController::class, 'storeWithFile']);
     Route::get('/courses/{course}/contents/{content}', [\App\Http\Controllers\Api\CourseContentController::class, 'show']);
+    Route::get('/courses/{course}/contents/{content}/files', [\App\Http\Controllers\Api\CourseContentController::class, 'getContentWithFiles']);
     Route::put('/courses/{course}/contents/{content}', [\App\Http\Controllers\Api\CourseContentController::class, 'update']);
     Route::delete('/courses/{course}/contents/{content}', [\App\Http\Controllers\Api\CourseContentController::class, 'destroy']);
     Route::post('/courses/{course}/contents/reorder', [\App\Http\Controllers\Api\CourseContentController::class, 'reorder']);
     Route::post('/courses/{course}/contents/upload-video', [\App\Http\Controllers\Api\CourseContentController::class, 'uploadVideo']);
+    Route::post('/courses/{course}/contents/upload-file', [\App\Http\Controllers\Api\CourseContentController::class, 'uploadFile']);
     
     // Admin Blog Management Routes
     Route::apiResource('categories', CategoryController::class);

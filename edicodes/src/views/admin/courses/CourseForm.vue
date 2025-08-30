@@ -176,22 +176,27 @@
               <!-- Current Thumbnail Preview -->
               <div v-if="thumbnailPreview || form.thumbnail" class="flex items-center space-x-4 space-x-reverse">
                 <img
-                  :src="thumbnailPreview || form.thumbnail"
+                  :src="thumbnailPreview || getStorageUrl(form.thumbnail)"
                   :alt="form.title"
-                  class="h-16 w-16 rounded-lg object-cover"
+                  class="h-16 w-100 rounded-lg object-cover"
                 />
-                <button
-                  type="button"
-                  @click="removeThumbnail"
-                  class="text-red-400 hover:text-red-300 text-xs font-vazir"
-                >
-                  حذف
-                </button>
+                <div class="flex flex-col space-y-2">
+                  <button
+                    type="button"
+                    @click="removeThumbnail"
+                    class="text-red-400 hover:text-red-300 text-xs font-vazir"
+                  >
+                    حذف
+                  </button>
+                  <span v-if="form.thumbnail && !thumbnailPreview" class="text-xs text-gray-400 font-vazir">
+                    تصویر فعلی دوره
+                  </span>
+                </div>
               </div>
 
               <!-- File Upload -->
               <div>
-                <label for="thumbnail_file" class="block text-sm font-medium text-gray-300 mb-2 font-vazir">
+                <label for="thumbnail_file" class="hidden">
                   انتخاب تصویر
                 </label>
                 <div class="space-y-2">
@@ -209,10 +214,16 @@
                     class="w-full px-3 py-2 bg-primary/20 border border-primary/30 text-primary rounded-lg hover:bg-primary/30 transition-colors duration-200 font-vazir text-sm"
                   >
                     <font-awesome-icon icon="upload" class="ml-2 h-3 w-3" />
-                    انتخاب فایل
+                    {{ form.thumbnail && !selectedFile ? 'تغییر تصویر' : 'انتخاب فایل' }}
                   </button>
                   <span v-if="selectedFile" class="text-xs text-gray-400 font-vazir block text-center">
                     {{ selectedFile.name }}
+                  </span>
+                  <span v-else-if="form.thumbnail && !selectedFile" class="text-xs text-gray-400 font-vazir block text-center">
+                    تصویر فعلی: {{ getThumbnailFileName(form.thumbnail) }}
+                  </span>
+                  <span v-else class="text-xs text-gray-400 font-vazir block text-center">
+                    هیچ تصویری انتخاب نشده است
                   </span>
                 </div>
                 <p class="text-xs text-gray-400 mt-2 font-vazir text-center">
@@ -308,11 +319,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import courseService from '@/services/courseService';
 import categoryService from '@/services/categoryService';
-import { formatMoneyInput, parseMoneyInput, formatPriceLabel } from '@/utils/moneyFormatter';
+import { formatMoneyInput, parseMoneyInput, formatPriceLabel, getStorageUrl } from '@/utils/moneyFormatter';
 
 const router = useRouter();
 const route = useRoute();
@@ -388,10 +399,9 @@ const fetchCategories = async () => {
   try {
     const response = await categoryService.getCategories();
     categories.value = response.data.data || response.data;
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    categories.value = [];
-  }
+      } catch (error) {
+      categories.value = [];
+    }
 };
 
 const fetchCourse = async () => {
@@ -430,15 +440,13 @@ const fetchCourse = async () => {
     // Update price display value
     priceDisplayValue.value = formatMoneyInput(form.value.price);
   } catch (error) {
-    console.error('Error fetching course:', error);
-    
     // Handle specific error cases
     if (error.response?.status === 404) {
       // Course not found - redirect back to courses list
       router.push('/admin/courses');
       return;
     }
-    
+
     // Set default form values on error
     form.value = {
       title: '',
@@ -454,7 +462,7 @@ const fetchCourse = async () => {
       category_id: '',
       admin_id: 1
     };
-    
+
     priceDisplayValue.value = '';
   }
 };
@@ -462,28 +470,96 @@ const fetchCourse = async () => {
 const handleSubmit = async () => {
   try {
     loading.value = true;
-    
+
     // Prepare form data
     const submitData = { ...form.value };
-    
+
+    // Validate required fields before submission
+    if (!submitData.title?.trim()) {
+      alert('عنوان دوره الزامی است');
+      return;
+    }
+
+    if (!submitData.description?.trim()) {
+      alert('توضیحات دوره الزامی است');
+      return;
+    }
+
+    if (submitData.price === null || submitData.price === undefined || submitData.price === '') {
+      alert('قیمت دوره الزامی است');
+      return;
+    }
+
+    if (!submitData.status) {
+      alert('وضعیت دوره الزامی است');
+      return;
+    }
+
+    if (!submitData.level) {
+      alert('سطح دوره الزامی است');
+      return;
+    }
+
+    // Ensure admin_id is set
+    if (!submitData.admin_id) {
+      submitData.admin_id = 1; // Default admin ID
+    }
+
+    // Ensure price is a proper integer
+    if (typeof submitData.price === 'string') {
+      submitData.price = parseInt(submitData.price.replace(/[^\d]/g, '')) || 0;
+    }
+
+    // Ensure category_id is properly handled
+    if (submitData.category_id === '') {
+      submitData.category_id = null;
+    }
+
     // If we have a selected file, use it directly (the service will handle the upload)
     if (selectedFile.value) {
+      // Double-check that the file is still valid
+      if (!(selectedFile.value instanceof File)) {
+        alert('خطا: فایل انتخاب شده معتبر نیست. لطفا دوباره فایل را انتخاب کنید.');
+        return;
+      }
+
+      // Validate file type one more time
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(selectedFile.value.type)) {
+        alert('نوع فایل انتخاب شده پشتیبانی نمی‌شود. لطفا فایل PNG, JPG, JPEG یا WebP انتخاب کنید.');
+        return;
+      }
+
       submitData.thumbnail = selectedFile.value;
     }
-    
+
     if (isEditing.value) {
       const courseId = route.params.id;
       await courseService.updateCourse(courseId, submitData);
-      // Show success message
     } else {
       await courseService.createCourse(submitData);
-      // Show success message
     }
-    
+
     router.push('/admin/courses');
   } catch (error) {
-    console.error('Error saving course:', error);
-    // Show error message
+    if (error.response) {
+      // Handle validation errors specifically
+      if (error.response.status === 422 && error.response.data.errors) {
+        // Show validation errors to user
+        const errorMessages = Object.values(error.response.data.errors).flat();
+        alert('خطاهای اعتبارسنجی:\n' + errorMessages.join('\n'));
+        return;
+      }
+
+      // Handle other types of errors
+      if (error.response.data.message) {
+        alert('خطا: ' + error.response.data.message);
+        return;
+      }
+    }
+
+    // Generic error message
+    alert('خطایی در ذخیره دوره رخ داد. لطفا مجددا تلاش کنید.');
   } finally {
     loading.value = false;
   }
@@ -492,10 +568,15 @@ const handleSubmit = async () => {
 
 
 // Handle price input changes
-const handlePriceInput = (event) => {
+const handlePriceInput = async (event) => {
   const inputValue = event.target.value;
   const parsedPrice = parseMoneyInput(inputValue);
   form.value.price = parsedPrice;
+
+  // Use nextTick to ensure the DOM updates properly
+  await nextTick();
+  // Re-format the display value to ensure proper comma formatting
+  priceDisplayValue.value = formatMoneyInput(parsedPrice);
 };
 
 const getStatusText = (status) => {
@@ -518,6 +599,7 @@ const getLevelText = (level) => {
 
 const handleThumbnailUpload = (event) => {
   const file = event.target.files[0];
+
   if (file) {
     // Validate file size (10MB = 10 * 1024 * 1024 bytes)
     if (file.size > 10 * 1024 * 1024) {
@@ -533,13 +615,21 @@ const handleThumbnailUpload = (event) => {
     }
 
     selectedFile.value = file;
-    
+
     // Create preview URL
     const reader = new FileReader();
     reader.onload = (e) => {
       thumbnailPreview.value = e.target.result;
     };
-    reader.readAsDataURL(file);
+    reader.onerror = (e) => {
+      alert('خطا در خواندن فایل. لطفا دوباره فایل را انتخاب کنید.');
+    };
+
+    try {
+      reader.readAsDataURL(file);
+    } catch (error) {
+      alert('خطا در پردازش فایل. لطفا دوباره فایل را انتخاب کنید.');
+    }
   }
 };
 
@@ -549,7 +639,24 @@ const removeThumbnail = () => {
   selectedFile.value = null;
   if (fileInput.value) {
     fileInput.value.value = '';
+    // Also clear the files array
+    fileInput.value.files = null;
   }
+};
+
+const getThumbnailFileName = (thumbnailPath) => {
+  if (!thumbnailPath) return '';
+  
+  // Extract filename from path
+  const parts = thumbnailPath.split('/');
+  const filename = parts[parts.length - 1];
+  
+  // Remove UUID prefix and show clean name
+  if (filename.startsWith('course_thumbnail_')) {
+    return filename.replace('course_thumbnail_', '').split('.')[0] + '...';
+  }
+  
+  return filename;
 };
 
 const uploadThumbnail = async () => {
@@ -579,11 +686,10 @@ const uploadThumbnail = async () => {
     } else {
       throw new Error(result.message || 'Upload failed');
     }
-  } catch (error) {
-    console.error('Error uploading thumbnail:', error);
-    alert('خطا در آپلود تصویر: ' + error.message);
-    return null;
-  }
+      } catch (error) {
+      alert('خطا در آپلود تصویر: ' + error.message);
+      return null;
+    }
 };
 </script>
 

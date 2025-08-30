@@ -96,4 +96,12 @@ class Course extends Model
         }
         return null;
     }
+
+    /**
+     * Get the contents count for the course.
+     */
+    public function getContentsCountAttribute(): int
+    {
+        return $this->contents()->count();
+    }
 }

@@ -6,14 +6,29 @@ const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
 // Create axios instance with auth header
 const createAuthInstance = () => {
   const token = localStorage.getItem('admin_token');
-  return axios.create({
+  const instance = axios.create({
     baseURL: API_URL,
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
       'Accept': 'application/json'
     }
   });
+
+  // Add response interceptor for debugging
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      console.error('Axios error:', error);
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response headers:', error.response.headers);
+        console.error('Response data:', error.response.data);
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  return instance;
 };
 
 /**
@@ -48,28 +63,43 @@ const courseService = {
    */
   async createCourse(courseData) {
     const instance = createAuthInstance();
-    
+
     // Check if we have a file to upload
     if (courseData.thumbnail instanceof File) {
       // Create FormData for file upload
       const formData = new FormData();
-      
+
       // Add all course data to FormData
       Object.keys(courseData).forEach(key => {
         if (key === 'thumbnail' && courseData[key] instanceof File) {
-          formData.append('thumbnail', courseData[key]);
+
+
+          // Try appending with explicit filename and type
+          formData.append('file', courseData[key], courseData[key].name);
         } else if (key !== 'thumbnail') {
-          // Handle boolean values properly
-          if (typeof courseData[key] === 'boolean') {
-            formData.append(key, courseData[key] ? '1' : '0');
+          const value = courseData[key];
+
+          // Handle different data types properly
+          if (typeof value === 'boolean') {
+            formData.append(key, value ? '1' : '0');
+          } else if (typeof value === 'number') {
+            formData.append(key, value.toString());
+          } else if (value === null || value === undefined) {
+            // For create operations, ensure required fields are not null
+            if (['title', 'description', 'price', 'status', 'level', 'admin_id'].includes(key)) {
+              formData.append(key, value || '');
+            }
           } else {
-            formData.append(key, courseData[key]);
+            formData.append(key, value);
           }
         }
       });
-      
-      // Update headers for multipart/form-data
-      instance.defaults.headers['Content-Type'] = 'multipart/form-data';
+
+
+
+      // Don't set Content-Type header - let axios set it automatically for FormData
+      console.log('Sending FormData request to:', '/admin/courses');
+
       return instance.post('/admin/courses', formData);
     } else {
       // Regular JSON request
@@ -85,33 +115,21 @@ const courseService = {
    */
   async updateCourse(id, courseData) {
     const instance = createAuthInstance();
-    
+
     // Check if we have a file to upload
     if (courseData.thumbnail instanceof File) {
-      // Create FormData for file upload
-      const formData = new FormData();
-      
-      // Add all course data to FormData
-      Object.keys(courseData).forEach(key => {
-        if (key === 'thumbnail' && courseData[key] instanceof File) {
-          formData.append('thumbnail', courseData[key]);
-        } else if (key !== 'thumbnail') {
-          // Handle boolean values properly
-          if (typeof courseData[key] === 'boolean') {
-            formData.append(key, courseData[key] ? '1' : '0');
-          } else {
-            formData.append(key, courseData[key]);
-          }
-        }
-      });
-      
-      // Update headers for multipart/form-data
-      instance.defaults.headers['Content-Type'] = 'multipart/form-data';
-      return instance.put(`/admin/courses/${id}`, formData);
-    } else {
-      // Regular JSON request
-      return instance.put(`/admin/courses/${id}`, courseData);
+      // First, upload the thumbnail file separately
+      try {
+        const uploadResult = await this.uploadThumbnail(courseData.thumbnail);
+        // Replace the file with the uploaded path
+        courseData.thumbnail = uploadResult.data.path;
+      } catch (uploadError) {
+        throw new Error('Failed to upload thumbnail: ' + uploadError.message);
+      }
     }
+
+    // Now update the course with the thumbnail path
+    return instance.put(`/admin/courses/${id}`, courseData);
   },
 
   /**
@@ -195,6 +213,43 @@ const courseService = {
       }
     });
     return instance.post(`/admin/courses/${courseId}/contents/upload-video`, formData);
+  }
+};
+
+// Test function for debugging file uploads
+export const testFileUpload = async (file) => {
+  console.log('Testing file upload with file:', file);
+
+  const instance = createAuthInstance();
+
+  // Create FormData
+  const formData = new FormData();
+  formData.append('file', file, file.name);
+
+  // Add some test data
+  formData.append('title', 'Test Course');
+  formData.append('description', 'Test description');
+  formData.append('price', '1000');
+  formData.append('status', 'draft');
+  formData.append('level', 'beginner');
+  formData.append('admin_id', '1');
+
+  console.log('FormData created:');
+  for (let [key, value] of formData.entries()) {
+    if (value instanceof File) {
+      console.log(`- ${key}: File (${value.name}, ${value.type}, ${value.size} bytes)`);
+    } else {
+      console.log(`- ${key}: ${value}`);
+    }
+  }
+
+  try {
+    const response = await instance.post('/admin/courses', formData);
+    console.log('Upload successful:', response);
+    return response;
+  } catch (error) {
+    console.error('Upload failed:', error);
+    throw error;
   }
 };
 

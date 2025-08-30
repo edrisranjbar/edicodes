@@ -24,24 +24,8 @@ class CourseController extends Controller
             ->orderBy('featured', 'desc')
             ->orderBy('created_at', 'desc');
 
-        // Filter by category
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        // Filter by level
-        if ($request->has('level')) {
-            $query->where('level', $request->level);
-        }
-
-        // Filter by price (free or paid)
-        if ($request->has('price_type')) {
-            if ($request->price_type === 'free') {
-                $query->where('price', 0);
-            } elseif ($request->price_type === 'paid') {
-                $query->where('price', '>', 0);
-            }
-        }
+        // Apply filters
+        $this->applyFilters($query, $request);
 
         $courses = $query->paginate(12);
 
@@ -59,25 +43,8 @@ class CourseController extends Controller
         $query = Course::with(['category', 'admin'])
             ->orderBy('created_at', 'desc');
 
-        // Filter by status
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Filter by category
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        // Filter by level
-        if ($request->has('level')) {
-            $query->where('level', $request->level);
-        }
-
-        // Filter by admin
-        if ($request->has('admin_id')) {
-            $query->where('admin_id', $request->admin_id);
-        }
+        // Apply filters
+        $this->applyFilters($query, $request);
 
         $courses = $query->paginate(12);
 
@@ -97,7 +64,7 @@ class CourseController extends Controller
             'description' => 'required|string',
             'short_description' => 'nullable|string|max:500',
             'price' => 'required|integer|min:0',
-            'thumbnail' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:10240', // 10MB max
+            'thumbnail' => 'nullable', // Accept both file uploads and path strings
             'status' => ['required', Rule::in(['draft', 'published', 'archived'])],
             'featured' => 'nullable|boolean',
             'duration' => 'nullable|string|max:100',
@@ -106,28 +73,20 @@ class CourseController extends Controller
             'admin_id' => 'required|exists:admins,id'
         ]);
 
-        $validated['slug'] = Str::slug($validated['title']);
-        
-        // Handle featured field conversion
-        if (isset($validated['featured'])) {
-            if (is_string($validated['featured'])) {
-                $validated['featured'] = in_array($validated['featured'], ['1', 'true', 'on']);
-            }
-        } else {
-            $validated['featured'] = $request->boolean('featured', false);
-        }
+        // Process course data
+        $validated = $this->processCourseData($validated, $request);
 
-        // Handle thumbnail upload
+        // Handle thumbnail upload if present
         if ($request->hasFile('thumbnail')) {
-            $file = $request->file('thumbnail');
-            $extension = $file->getClientOriginalExtension();
-            $filename = 'course_thumbnail_' . Str::uuid() . '.' . $extension;
+            $validated['thumbnail'] = $this->uploadThumbnail($request->file('thumbnail'));
+        }
+        // Handle thumbnail path if provided (from frontend upload)
+        elseif ($request->has('thumbnail') && is_string($request->input('thumbnail')) && !empty($request->input('thumbnail'))) {
+            $thumbnailPath = $request->input('thumbnail');
             
-            // Store in the public disk under uploads/courses/thumbnails folder
-            $path = $file->storeAs('uploads/courses/thumbnails', $filename, 'public');
-            
-            if ($path) {
-                $validated['thumbnail'] = $path;
+            // Validate that the path looks like a valid storage path
+            if (str_starts_with($thumbnailPath, 'uploads/courses/thumbnails/')) {
+                $validated['thumbnail'] = $thumbnailPath;
             }
         }
 
@@ -188,40 +147,32 @@ class CourseController extends Controller
             'description' => 'sometimes|required|string',
             'short_description' => 'nullable|string|max:500',
             'price' => 'sometimes|required|integer|min:0',
-            'thumbnail' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:10240', // 10MB max
             'status' => ['sometimes', 'required', Rule::in(['draft', 'published', 'archived'])],
             'featured' => 'nullable|boolean',
             'duration' => 'nullable|string|max:100',
             'level' => ['sometimes', 'required', Rule::in(['beginner', 'intermediate', 'advanced'])],
-            'category_id' => 'nullable|exists:categories,id'
+            'category_id' => 'nullable|exists:categories,id',
+            'thumbnail' => 'nullable' // Accept both file uploads and path strings
         ]);
 
-        if (isset($validated['title'])) {
-            $validated['slug'] = Str::slug($validated['title']);
-        }
+        // Process course data
+        $validated = $this->processCourseData($validated, $request);
 
-        if (isset($validated['featured'])) {
-            if (is_string($validated['featured'])) {
-                $validated['featured'] = in_array($validated['featured'], ['1', 'true', 'on']);
-            }
-        }
-
-        // Handle thumbnail upload
+        // Handle thumbnail upload if present
         if ($request->hasFile('thumbnail')) {
-            // Delete old thumbnail if exists
-            if ($course->thumbnail && Storage::exists($course->thumbnail)) {
-                Storage::delete($course->thumbnail);
-            }
+            // Delete old thumbnail
+            $this->deleteThumbnail($course->thumbnail);
             
-            $file = $request->file('thumbnail');
-            $extension = $file->getClientOriginalExtension();
-            $filename = 'course_thumbnail_' . Str::uuid() . '.' . $extension;
+            // Upload new thumbnail
+            $validated['thumbnail'] = $this->uploadThumbnail($request->file('thumbnail'));
+        }
+        // Handle thumbnail path if provided (from frontend upload)
+        elseif ($request->has('thumbnail') && is_string($request->input('thumbnail')) && !empty($request->input('thumbnail'))) {
+            $thumbnailPath = $request->input('thumbnail');
             
-            // Store in the public disk under uploads/courses/thumbnails folder
-            $path = $file->storeAs('uploads/courses/thumbnails', $filename, 'public');
-            
-            if ($path) {
-                $validated['thumbnail'] = $path;
+            // Validate that the path looks like a valid storage path
+            if (str_starts_with($thumbnailPath, 'uploads/courses/thumbnails/')) {
+                $validated['thumbnail'] = $thumbnailPath;
             }
         }
 
@@ -240,17 +191,10 @@ class CourseController extends Controller
     public function destroy(Course $course): JsonResponse
     {
         // Delete associated content files
-        $videoContents = $course->contents()->where('type', 'video')->get();
-        foreach ($videoContents as $content) {
-            if ($content->video_path && Storage::exists($content->video_path)) {
-                Storage::delete($content->video_path);
-            }
-        }
+        $this->deleteCourseFiles($course);
 
         // Delete thumbnail if exists
-        if ($course->thumbnail && Storage::exists($course->thumbnail)) {
-            Storage::delete($course->thumbnail);
-        }
+        $this->deleteThumbnail($course->thumbnail);
 
         $course->delete();
 
@@ -361,5 +305,104 @@ class CourseController extends Controller
             'success' => true,
             'data' => $course
         ]);
+    }
+
+    /**
+     * Apply filters to the course query
+     */
+    private function applyFilters($query, Request $request): void
+    {
+        // Filter by status
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by category
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // Filter by level
+        if ($request->has('level')) {
+            $query->where('level', $request->level);
+        }
+
+        // Filter by admin
+        if ($request->has('admin_id')) {
+            $query->where('admin_id', $request->admin_id);
+        }
+
+        // Filter by price (free or paid)
+        if ($request->has('price_type')) {
+            if ($request->price_type === 'free') {
+                $query->where('price', 0);
+            } elseif ($request->price_type === 'paid') {
+                $query->where('price', '>', 0);
+            }
+        }
+    }
+
+    /**
+     * Process course data before saving
+     */
+    private function processCourseData(array $data, Request $request): array
+    {
+        // Generate slug from title if present
+        if (isset($data['title'])) {
+            $data['slug'] = Str::slug($data['title']);
+        }
+
+        // Handle featured field conversion
+        if (isset($data['featured'])) {
+            if (is_string($data['featured'])) {
+                $data['featured'] = in_array($data['featured'], ['1', 'true', 'on']);
+            }
+        } else {
+            $data['featured'] = $request->boolean('featured', false);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Upload a thumbnail file
+     */
+    private function uploadThumbnail($file): string
+    {
+        $extension = $file->getClientOriginalExtension();
+        $filename = 'course_thumbnail_' . Str::uuid() . '.' . $extension;
+        
+        // Store in the public disk under uploads/courses/thumbnails folder
+        $path = $file->storeAs('uploads/courses/thumbnails', $filename, 'public');
+        
+        if (!$path) {
+            throw new \Exception('Failed to store thumbnail file');
+        }
+
+        return $path;
+    }
+
+    /**
+     * Delete a thumbnail file
+     */
+    private function deleteThumbnail(?string $thumbnailPath): void
+    {
+        if ($thumbnailPath && Storage::exists($thumbnailPath)) {
+            Storage::delete($thumbnailPath);
+        }
+    }
+
+    /**
+     * Delete all course-related files
+     */
+    private function deleteCourseFiles(Course $course): void
+    {
+        // Delete associated content files
+        $videoContents = $course->contents()->where('type', 'video')->get();
+        foreach ($videoContents as $content) {
+            if ($content->video_path && Storage::exists($content->video_path)) {
+                Storage::delete($content->video_path);
+            }
+        }
     }
 }

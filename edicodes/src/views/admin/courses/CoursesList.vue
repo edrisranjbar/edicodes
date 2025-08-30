@@ -145,8 +145,8 @@
                 <div class="flex items-center">
                   <div class="flex-shrink-0 h-12 w-12">
                     <img
-                      v-if="course.thumbnail"
-                      :src="course.thumbnail"
+                      v-if="getCourseThumbnailUrl(course)"
+                      :src="getCourseThumbnailUrl(course)"
                       :alt="course.title || 'Course thumbnail'"
                       class="h-12 w-12 rounded-lg object-cover"
                     />
@@ -282,7 +282,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import courseService from '@/services/courseService';
 import enrollmentService from '@/services/enrollmentService';
-import { formatMoney } from '@/utils/moneyFormatter';
+import { formatMoney, getCourseThumbnailUrl } from '@/utils/moneyFormatter';
 
 const router = useRouter();
 const loading = ref(false);
