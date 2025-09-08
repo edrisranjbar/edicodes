@@ -18,13 +18,21 @@
             <font-awesome-icon icon="home" class="ml-1.5" />
             خانه
           </router-link>
-          <router-link 
-            to="/blog" 
-            class="nav-link" 
+          <router-link
+            to="/blog"
+            class="nav-link"
             :class="{ 'active': $route.path.includes('/blog') }"
           >
             <font-awesome-icon icon="book" class="ml-1.5" />
             وبلاگ
+          </router-link>
+          <router-link
+            to="/courses"
+            class="nav-link"
+            :class="{ 'active': $route.path === '/courses' }"
+          >
+            <font-awesome-icon icon="graduation-cap" class="ml-1.5" />
+            دوره های آموزشی
           </router-link>
           <router-link 
             to="/#projects" 
@@ -87,6 +95,10 @@
           <router-link to="/blog" class="mobile-nav-link" @click="isOpen = false">
             <font-awesome-icon icon="book" class="ml-2" />
             وبلاگ
+          </router-link>
+          <router-link to="/courses" class="mobile-nav-link" @click="isOpen = false">
+            <font-awesome-icon icon="graduation-cap" class="ml-2" />
+            دوره های آموزشی
           </router-link>
           <router-link to="/#projects" class="mobile-nav-link" @click="isOpen = false">
             <font-awesome-icon icon="code" class="ml-2" />

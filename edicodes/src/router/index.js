@@ -27,6 +27,16 @@ const router = createRouter({
       component: () => import('@/views/Post.vue')
     },
     {
+      path: '/courses',
+      name: 'courses',
+      component: () => import('@/views/Courses.vue')
+    },
+    {
+      path: '/courses/:slug',
+      name: 'course-detail',
+      component: () => import('@/views/CourseDetail.vue')
+    },
+    {
       path: '/donation/success',
       name: 'donation-success',
       component: DonationSuccess

@@ -91,21 +91,18 @@ class CourseSeeder extends Seeder
             [
                 'title' => 'معرفی دوره',
                 'content' => 'در این دوره شما با مفاهیم اصلی آشنا خواهید شد.',
-                'type' => 'text',
                 'order' => 1,
                 'is_free' => true
             ],
             [
                 'title' => 'نصب و راه اندازی',
                 'content' => 'مراحل نصب و پیکربندی محیط توسعه',
-                'type' => 'text',
                 'order' => 2,
                 'is_free' => true
             ],
             [
                 'title' => 'ویدیوی آموزشی - بخش اول',
                 'content' => 'آموزش عملی مفاهیم اولیه',
-                'type' => 'video',
                 'order' => 3,
                 'video_duration' => 1800, // 30 minutes
                 'is_free' => false
@@ -113,7 +110,6 @@ class CourseSeeder extends Seeder
             [
                 'title' => 'تمرین عملی',
                 'content' => 'تمرینات عملی برای تثبیت یادگیری',
-                'type' => 'text',
                 'order' => 4,
                 'is_free' => false
             ]

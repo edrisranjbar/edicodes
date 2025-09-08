@@ -63,7 +63,7 @@
             </div>
 
               <!-- Course Status -->
-                  <div class="mt-4">
+              <div class="mt-4">
                 <span
                   :class="getStatusClasses(course.status)"
                   class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium font-vazir"
@@ -74,9 +74,9 @@
                 
                 <span
                   v-if="course.featured"
-                  class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 ml-2 font-vazir"
+                  class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 ml-1 font-vazir"
                 >
-                  <font-awesome-icon icon="star" class="ml-1 h-3 w-3" />
+                  <font-awesome-icon icon="star" class="m-1 h-3 w-3" />
                   ویژه
                 </span>
               </div>

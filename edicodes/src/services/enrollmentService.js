@@ -3,16 +3,26 @@ import axios from 'axios';
 // Get the API base URL from config
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
-// Create axios instance with auth header
+// Create axios instance with auth header (supports both admin and user tokens)
 const createAuthInstance = () => {
-  const token = localStorage.getItem('admin_token');
+  const adminToken = localStorage.getItem('admin_token');
+  const userToken = localStorage.getItem('user_token');
+
+  // Use admin token if available, otherwise use user token
+  const token = adminToken || userToken;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   return axios.create({
     baseURL: API_URL,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
+    headers: headers
   });
 };
 
@@ -20,6 +30,34 @@ const createAuthInstance = () => {
  * Service for handling enrollment-related API calls
  */
 const enrollmentService = {
+  /**
+   * Enroll in a course (user)
+   * @param {number|string} courseId - Course ID
+   * @returns {Promise} - API response
+   */
+  async enrollInCourse(courseId) {
+    const instance = createAuthInstance();
+    return instance.post(`/courses/${courseId}/enroll`);
+  },
+
+  /**
+   * Get user's enrollments
+   * @returns {Promise} - API response
+   */
+  async getUserEnrollments() {
+    const instance = createAuthInstance();
+    return instance.get('/enrollments');
+  },
+
+  /**
+   * Check if user is enrolled in a specific course
+   * @param {number|string} courseId - Course ID
+   * @returns {Promise} - API response
+   */
+  async checkEnrollmentStatus(courseId) {
+    const instance = createAuthInstance();
+    return instance.get(`/courses/${courseId}/enrollment-status`);
+  },
   /**
    * Get enrollment statistics (admin)
    * @returns {Promise} - API response
@@ -103,6 +141,11 @@ const enrollmentService = {
 };
 
 export default enrollmentService;
+
+
+
+
+
 
 
 

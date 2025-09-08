@@ -96,6 +96,58 @@ class EnrollmentController extends Controller
     }
 
     /**
+     * Check if user is enrolled in a specific course.
+     */
+    public function checkEnrollmentStatus(Request $request, Course $course): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            // For development/testing, if no user is authenticated, return not enrolled
+            if (!$user) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'is_enrolled' => false,
+                        'enrollment' => null,
+                        'can_access_content' => false
+                    ]
+                ]);
+            }
+
+            $isEnrolled = $course->isEnrolledBy($user);
+            $enrollment = null;
+
+            if ($isEnrolled) {
+                $enrollment = $course->enrollments()
+                    ->where('user_id', $user->id)
+                    ->first();
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'is_enrolled' => $isEnrolled,
+                    'enrollment' => $enrollment,
+                    'can_access_content' => $isEnrolled
+                ]
+            ]);
+        } catch (\Exception $e) {
+            // Log the error and return a safe response
+            \Log::error('Error checking enrollment status: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'is_enrolled' => false,
+                    'enrollment' => null,
+                    'can_access_content' => false
+                ]
+            ]);
+        }
+    }
+
+    /**
      * Process payment for enrollment.
      */
     public function processPayment(Request $request, Enrollment $enrollment): JsonResponse

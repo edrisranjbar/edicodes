@@ -29,7 +29,9 @@ import {
   // File uploader icon
   faCloudUploadAlt, faUpload,
   faFileLines,
-  faSignal, faStar, faFolderOpen
+  faSignal, faStar, faFolderOpen,
+  // Additional icons for course detail
+  faArchive, faSeedling, faCircle, faExclamationTriangle, faFile
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faGithub, faYoutube, faLinkedin, faTwitter, faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -52,7 +54,8 @@ library.add(
   faUser, faComments, faCommentSlash, faReply, faClock,
   faDonate, faCog, faStar, faSignal,
   faDownload, faGraduationCap, faList, faBan, faCheck, faUserGraduate, 
-  faMoneyBillWave, faUndo, faTrash, faArrowRight, faRedo, faFileLines, faFolderOpen
+  faMoneyBillWave, faUndo, faTrash, faArrowRight, faRedo, faFileLines, faFolderOpen,
+  faArchive, faSeedling, faCircle, faExclamationTriangle, faFile
 )
 
 const app = createApp(App)

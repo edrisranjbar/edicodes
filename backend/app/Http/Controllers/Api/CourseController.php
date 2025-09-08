@@ -20,6 +20,7 @@ class CourseController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Course::with(['category', 'admin'])
+            ->withCount('contents')
             ->where('status', 'published')
             ->orderBy('featured', 'desc')
             ->orderBy('created_at', 'desc');
@@ -41,6 +42,7 @@ class CourseController extends Controller
     public function adminIndex(Request $request): JsonResponse
     {
         $query = Course::with(['category', 'admin'])
+            ->withCount('contents')
             ->orderBy('created_at', 'desc');
 
         // Apply filters

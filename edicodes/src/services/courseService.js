@@ -36,6 +36,35 @@ const createAuthInstance = () => {
  */
 const courseService = {
   /**
+   * Get all published courses (public)
+   * @returns {Promise} - API response
+   */
+  async getCourses() {
+    const instance = axios.create({
+      baseURL: API_URL,
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    return instance.get('/courses');
+  },
+
+  /**
+   * Get course contents (public)
+   * @param {number|string} courseId - Course ID
+   * @returns {Promise} - API response
+   */
+  async getCourseContents(courseId) {
+    const instance = axios.create({
+      baseURL: API_URL,
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    return instance.get(`/courses/${courseId}/contents`);
+  },
+
+  /**
    * Get all courses (admin)
    * @param {number} page - Page number for pagination
    * @returns {Promise} - API response

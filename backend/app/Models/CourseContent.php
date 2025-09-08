@@ -13,7 +13,6 @@ class CourseContent extends Model
         'course_id',
         'title',
         'description',
-        'type',
         'content',
         'video_path',
         'video_url',
@@ -27,6 +26,10 @@ class CourseContent extends Model
         'is_free' => 'boolean',
         'order' => 'integer',
         'video_duration' => 'integer'
+    ];
+
+    protected $hidden = [
+        'type'
     ];
 
     /**

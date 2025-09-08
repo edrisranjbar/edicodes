@@ -94,6 +94,7 @@ Route::post('/page-view', [PageViewController::class, 'recordGenericPageView']);
 // Public Course Routes
 Route::apiResource('courses', CourseController::class)->only(['index', 'show']);
 Route::get('courses/slug/{course:slug}', [CourseController::class, 'show']);
+Route::get('/courses/{course}/contents', [CourseContentController::class, 'index']);
 
 // Payment Callback (Public - called by payment gateway)
 Route::post('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
@@ -103,14 +104,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Course Content Access
     Route::get('/courses/{course}/contents/{content}', [CourseController::class, 'getContent']);
     Route::get('/courses/{course}/contents/{content}/video', [VideoStreamController::class, 'stream'])->name('api.courses.video');
-    
+
     // Enrollment Routes
     Route::get('/enrollments', [EnrollmentController::class, 'index']);
     Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
+    Route::get('/courses/{course}/enrollment-status', [EnrollmentController::class, 'checkEnrollmentStatus']);
     Route::post('/enrollments/{enrollment}/payment', [EnrollmentController::class, 'processPayment']);
     Route::get('/enrollments/{enrollment}/verify', [EnrollmentController::class, 'verifyPayment']);
     Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'cancel']);
-    
+
     // Payment Routes
     Route::get('/payment/methods', [PaymentController::class, 'getPaymentMethods']);
     Route::post('/enrollments/{enrollment}/create-payment', [PaymentController::class, 'createPayment']);

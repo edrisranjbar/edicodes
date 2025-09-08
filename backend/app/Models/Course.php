@@ -73,8 +73,11 @@ class Course extends Model
     /**
      * Check if a user is enrolled in this course.
      */
-    public function isEnrolledBy(User $user): bool
+    public function isEnrolledBy($user): bool
     {
+        if (!$user || !isset($user->id)) {
+            return false;
+        }
         return $this->enrollments()->where('user_id', $user->id)->exists();
     }
 
