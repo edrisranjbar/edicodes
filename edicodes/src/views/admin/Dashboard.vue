@@ -261,27 +261,27 @@
         </div>
 
         <template v-else>
-          <div v-for="donation in recentDonations.data" :key="donation.id" class="py-4 px-6 hover:bg-black/20 transition-colors duration-200">
+          <div v-for="(donation, index) in recentDonations.data" :key="donation && donation.id ? donation.id : index" class="py-4 px-6 hover:bg-black/20 transition-colors duration-200">
             <div class="flex flex-col md:flex-row md:justify-between">
               <div class="flex items-center mb-2 md:mb-0">
-                <span class="text-white font-vazir">{{ donation.name || 'ناشناس' }}</span>
+                <span class="text-white font-vazir">{{ (donation && donation.name) ? donation.name : 'ناشناس' }}</span>
                 <span class="mx-2 text-white/30">|</span>
-                <span class="text-gray-400 text-sm">{{ formatDate(donation.created_at) }}</span>
+                <span class="text-gray-400 text-sm">{{ donation && donation.created_at ? formatDate(donation.created_at) : '' }}</span>
               </div>
               <div class="flex items-center">
                 <span :class="{
                   'px-2 py-1 text-xs rounded-md font-vazir': true,
-                  'bg-green-500/10 text-green-500': donation.status === 'paid',
-                  'bg-yellow-500/10 text-yellow-500': donation.status === 'pending',
-                  'bg-red-500/10 text-red-500': donation.status === 'failed'
+                  'bg-green-500/10 text-green-500': donation && donation.status === 'paid',
+                  'bg-yellow-500/10 text-yellow-500': donation && donation.status === 'pending',
+                  'bg-red-500/10 text-red-500': donation && donation.status === 'failed'
                 }">
-                  {{ donation.status_in_persian }}
+                  {{ donation && donation.status_in_persian ? donation.status_in_persian : '-' }}
                 </span>
                 <span class="mx-2 text-white/30">|</span>
-                <span class="text-white font-vazir">{{ donation.formatted_amount }}</span>
+                <span class="text-white font-vazir">{{ donation && donation.formatted_amount ? donation.formatted_amount : '-' }}</span>
               </div>
             </div>
-            <p v-if="donation.message" class="mt-2 text-white/70 text-sm font-vazir">{{ donation.message }}</p>
+            <p v-if="donation && donation.message" class="mt-2 text-white/70 text-sm font-vazir">{{ donation.message }}</p>
           </div>
         </template>
       </div>
@@ -572,7 +572,9 @@ const fetchRecentDonations = async () => {
       }
     });
 
-    recentDonations.value.data = response.data.data || [];
+    recentDonations.value.data = Array.isArray(response.data.data) 
+      ? response.data.data.filter(Boolean) 
+      : [];
   } catch (err) {
     console.error('Error fetching recent donations:', err);
     recentDonations.value.error = 'خطایی در بارگذاری حمایت‌ها رخ داده است';
