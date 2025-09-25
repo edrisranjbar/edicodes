@@ -572,9 +572,18 @@ const fetchRecentDonations = async () => {
       }
     });
 
-    recentDonations.value.data = Array.isArray(response.data.data) 
-      ? response.data.data.filter(Boolean) 
-      : [];
+    const body = response.data || {};
+    const paginated = body && body.data && typeof body.data === 'object' && !Array.isArray(body.data) && 'data' in body.data
+      ? body.data
+      : body;
+
+    const items = Array.isArray(paginated.data)
+      ? paginated.data
+      : Array.isArray(body.data)
+        ? body.data
+        : [];
+
+    recentDonations.value.data = items.filter(Boolean);
   } catch (err) {
     console.error('Error fetching recent donations:', err);
     recentDonations.value.error = 'خطایی در بارگذاری حمایت‌ها رخ داده است';

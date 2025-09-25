@@ -190,16 +190,28 @@ const fetchDonations = async () => {
         Authorization: `Bearer ${token}`
       }
     });
-    
-    donations.value = Array.isArray(response.data.data) 
-      ? response.data.data.filter(Boolean)
-      : [];
-    
-    // Update pagination
-    pagination.current_page = response.data.current_page;
-    pagination.last_page = response.data.last_page;
-    pagination.per_page = response.data.per_page;
-    pagination.total = response.data.total;
+
+    // Support both API shapes:
+    // A) { success, data: { current_page, data: [...] } }
+    // B) { current_page, data: [...] }
+    const body = response.data || {};
+    const paginated = body && body.data && typeof body.data === 'object' && !Array.isArray(body.data) && 'data' in body.data
+      ? body.data
+      : body;
+
+    const items = Array.isArray(paginated.data)
+      ? paginated.data
+      : Array.isArray(body.data)
+        ? body.data
+        : [];
+
+    donations.value = items.filter(Boolean);
+
+    // Update pagination safely
+    pagination.current_page = paginated.current_page || 1;
+    pagination.last_page = paginated.last_page || 1;
+    pagination.per_page = paginated.per_page || filters.per_page;
+    pagination.total = paginated.total || items.length;
     
   } catch (error) {
     console.error('Error fetching donations:', error);
