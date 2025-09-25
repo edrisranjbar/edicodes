@@ -102,6 +102,14 @@ class DonationController extends Controller
             $invoice = new Invoice;
             $invoice->amount((int)$data['amount']);
             $invoice->detail('donor', $donation->id);
+
+            Log::info('Initiating donation payment', [
+                'donation_id' => $donation->id,
+                'amount' => $donation->amount,
+                'ip_address' => $donation->ip_address,
+                'user_agent' => $donation->user_agent,
+                'created_at' => $donation->created_at,
+            ]);
             
             // Purchase the invoice and get the payment form
             $paymentRef = Payment::callbackUrl(route('donations.verify'))
