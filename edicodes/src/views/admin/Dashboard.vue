@@ -333,10 +333,10 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { API_URL } from '@/config';
 import { Line as LineChart } from 'vue-chartjs'
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import moment from 'moment-jalaali'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
 const loading = ref(true);
 const stats = ref({

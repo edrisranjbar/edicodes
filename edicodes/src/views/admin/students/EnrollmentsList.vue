@@ -130,7 +130,7 @@
             </tr>
           </thead>
           <tbody class="bg-black/20 divide-y divide-white/10">
-            <tr v-for="enrollment in filteredEnrollments" :key="enrollment.id" class="hover:bg-white/5">
+            <tr v-for="(enrollment, index) in filteredEnrollments" :key="enrollment && enrollment.id ? enrollment.id : index" class="hover:bg-white/5">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="flex-shrink-0 h-10 w-10">
@@ -139,22 +139,22 @@
                     </div>
                   </div>
                   <div class="mr-4">
-                    <div class="text-sm font-medium text-white font-vazir">{{ enrollment.user?.name || 'نامشخص' }}</div>
-                    <div class="text-sm text-gray-400 font-vazir">{{ enrollment.user?.email || 'ایمیل نامشخص' }}</div>
+                    <div class="text-sm font-medium text-white font-vazir">{{ (enrollment && enrollment.user?.name) ? enrollment.user.name : 'نامشخص' }}</div>
+                    <div class="text-sm text-gray-400 font-vazir">{{ (enrollment && enrollment.user?.email) ? enrollment.user.email : 'ایمیل نامشخص' }}</div>
                   </div>
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-white font-vazir">{{ enrollment.course?.title || 'دوره نامشخص' }}</div>
-                <div class="text-sm text-gray-400 font-vazir">{{ enrollment.course?.level || '' }}</div>
+                <div class="text-sm text-white font-vazir">{{ (enrollment && enrollment.course?.title) ? enrollment.course.title : 'دوره نامشخص' }}</div>
+                <div class="text-sm text-gray-400 font-vazir">{{ (enrollment && enrollment.course?.level) ? enrollment.course.level : '' }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-300 font-vazir">
-                  {{ formatDate(enrollment.enrolled_at) }}
+                  {{ enrollment && enrollment.enrolled_at ? formatDate(enrollment.enrolled_at) : 'نامشخص' }}
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span v-if="enrollment.amount_paid > 0" class="text-sm text-gray-300 font-vazir">
+                <span v-if="enrollment && enrollment.amount_paid > 0" class="text-sm text-gray-300 font-vazir">
                   {{ formatPrice(enrollment.amount_paid) }}
                 </span>
                 <span v-else class="text-sm text-green-400 font-vazir">رایگان</span>
@@ -162,40 +162,40 @@
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
                   :class="{
-                    'bg-yellow-100 text-yellow-800': enrollment.payment_status === 'pending',
-                    'bg-green-100 text-green-800': enrollment.payment_status === 'completed',
-                    'bg-red-100 text-red-800': enrollment.payment_status === 'failed',
-                    'bg-gray-100 text-gray-800': enrollment.payment_status === 'refunded'
+                    'bg-yellow-100 text-yellow-800': enrollment && enrollment.payment_status === 'pending',
+                    'bg-green-100 text-green-800': enrollment && enrollment.payment_status === 'completed',
+                    'bg-red-100 text-red-800': enrollment && enrollment.payment_status === 'failed',
+                    'bg-gray-100 text-gray-800': enrollment && enrollment.payment_status === 'refunded'
                   }"
                   class="inline-flex px-2 py-1 text-xs font-semibold rounded-full font-vazir"
                 >
-                  {{ getPaymentStatusText(enrollment.payment_status) }}
+                  {{ enrollment && enrollment.payment_status ? getPaymentStatusText(enrollment.payment_status) : 'نامشخص' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center space-x-2 space-x-reverse">
                   <button
-                    @click="viewEnrollmentDetails(enrollment)"
+                    @click="enrollment && viewEnrollmentDetails(enrollment)"
                     class="text-blue-400 hover:text-blue-300 transition-colors duration-200"
                   >
                     <font-awesome-icon icon="eye" class="h-4 w-4" />
                   </button>
                   <button
-                    v-if="enrollment.payment_status === 'pending'"
-                    @click="markAsCompleted(enrollment.id)"
+                    v-if="enrollment && enrollment.payment_status === 'pending'"
+                    @click="enrollment && enrollment.id && markAsCompleted(enrollment.id)"
                     class="text-green-400 hover:text-green-300 transition-colors duration-200"
                   >
                     <font-awesome-icon icon="check" class="h-4 w-4" />
                   </button>
                   <button
-                    v-if="enrollment.payment_status === 'completed'"
-                    @click="processRefund(enrollment.id)"
+                    v-if="enrollment && enrollment.payment_status === 'completed'"
+                    @click="enrollment && enrollment.id && processRefund(enrollment.id)"
                     class="text-orange-400 hover:text-orange-300 transition-colors duration-200"
                   >
                     <font-awesome-icon icon="undo" class="h-4 w-4" />
                   </button>
                   <button
-                    @click="cancelEnrollment(enrollment.id)"
+                    @click="enrollment && enrollment.id && cancelEnrollment(enrollment.id)"
                     class="text-red-400 hover:text-red-300 transition-colors duration-200"
                   >
                     <font-awesome-icon icon="times" class="h-4 w-4" />
@@ -306,7 +306,9 @@ const fetchEnrollments = async () => {
   try {
     loading.value = true;
     const response = await enrollmentService.getEnrollments();
-    enrollments.value = response.data.data || [];
+    enrollments.value = Array.isArray(response.data.data)
+      ? response.data.data.filter(Boolean)
+      : [];
   } catch (error) {
     console.error('Error fetching enrollments:', error);
   } finally {
@@ -396,23 +398,25 @@ const exportEnrollments = () => {
 };
 
 const filteredEnrollments = computed(() => {
-  let filtered = enrollments.value;
+  let filtered = Array.isArray(enrollments.value) ? enrollments.value.filter(Boolean) : [];
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(enrollment =>
-      enrollment.user?.name?.toLowerCase().includes(query) ||
-      enrollment.user?.email?.toLowerCase().includes(query) ||
-      enrollment.course?.title?.toLowerCase().includes(query)
-    );
+    filtered = filtered.filter((enrollment) => {
+      const name = enrollment?.user?.name?.toLowerCase() || '';
+      const email = enrollment?.user?.email?.toLowerCase() || '';
+      const courseTitle = enrollment?.course?.title?.toLowerCase() || '';
+      return name.includes(query) || email.includes(query) || courseTitle.includes(query);
+    });
   }
 
   if (statusFilter.value) {
-    filtered = filtered.filter(enrollment => enrollment.payment_status === statusFilter.value);
+    filtered = filtered.filter((enrollment) => enrollment && enrollment.payment_status === statusFilter.value);
   }
 
   if (courseFilter.value) {
-    filtered = filtered.filter(enrollment => enrollment.course_id === parseInt(courseFilter.value));
+    const courseId = parseInt(courseFilter.value);
+    filtered = filtered.filter((enrollment) => enrollment && enrollment.course_id === courseId);
   }
 
   return filtered;
