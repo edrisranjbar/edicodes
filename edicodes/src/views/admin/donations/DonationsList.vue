@@ -52,31 +52,31 @@
             </tr>
 
             <!-- Results -->
-            <tr v-for="donation in donations" :key="donation.id" class="hover:bg-black/40 transition-colors duration-150">
+            <tr v-for="(donation, index) in donations" :key="donation && donation.id ? donation.id : index" class="hover:bg-black/40 transition-colors duration-150">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white">
-                {{ donation.name || 'ناشناس' }}
+                {{ (donation && donation.name) ? donation.name : 'ناشناس' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white/80">
-                {{ donation.email || '-' }}
+                {{ donation && donation.email ? donation.email : '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white font-bold">
-                {{ donation.formatted_amount }}
+                {{ donation && donation.formatted_amount ? donation.formatted_amount : '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span :class="{
                   'px-2 py-1 text-xs rounded-md font-vazir': true,
-                  'bg-green-500/10 text-green-500': donation.status === 'paid',
-                  'bg-yellow-500/10 text-yellow-500': donation.status === 'pending',
-                  'bg-red-500/10 text-red-500': donation.status === 'failed'
+                  'bg-green-500/10 text-green-500': donation && donation.status === 'paid',
+                  'bg-yellow-500/10 text-yellow-500': donation && donation.status === 'pending',
+                  'bg-red-500/10 text-red-500': donation && donation.status === 'failed'
                 }">
-                  {{ donation.status_in_persian }}
+                  {{ donation && donation.status_in_persian ? donation.status_in_persian : '-' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white/80">
-                {{ donation.ref_id || '-' }}
+                {{ donation && donation.ref_id ? donation.ref_id : '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white/80">
-                {{ formatDate(donation.created_at) }}
+                {{ donation && donation.created_at ? formatDate(donation.created_at) : '-' }}
               </td>
             </tr>
           </tbody>
@@ -191,7 +191,9 @@ const fetchDonations = async () => {
       }
     });
     
-    donations.value = response.data.data || [];
+    donations.value = Array.isArray(response.data.data) 
+      ? response.data.data.filter(Boolean)
+      : [];
     
     // Update pagination
     pagination.current_page = response.data.current_page;
