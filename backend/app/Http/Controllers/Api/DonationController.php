@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\PersianDateHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Donation;
 use Illuminate\Http\Request;
@@ -13,6 +14,40 @@ use Shetabit\Payment\Facade\Payment;
 
 class DonationController extends Controller
 {
+    /**
+     * Get paid donations for public display
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function publicIndex(Request $request)
+    {
+        // Get only paid donations, sorted by created_at descending
+        $perPage = $request->input('per_page', 10);
+        
+        $donations = Donation::where('status', 'paid')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+        
+        // Transform donation data to show only public info
+        $donations->getCollection()->transform(function($donation) {
+            return [
+                'id' => $donation->id,
+                'name' => $donation->name ?? 'ناشناس',
+                'amount' => $donation->amount,
+                'formatted_amount' => $donation->formatted_amount,
+                'message' => $donation->message,
+                'created_at' => $donation->created_at->format('Y-m-d'),
+                'created_at_human' => PersianDateHelper::timeAgo($donation->created_at),
+            ];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'data' => $donations
+        ]);
+    }
+
     /**
      * Get all donations (admin only)
      *

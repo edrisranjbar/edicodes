@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\PaymentController;
 Route::post('/send-message', [ContactController::class, 'store'])->middleware('throttle:2,60');
 
 // Donation Endpoints
+Route::get('/donations', [DonationController::class, 'publicIndex']); // Public list of paid donations
 Route::post('/donations/pay', [DonationController::class, 'pay']);
 Route::get('/donations/verify', [DonationController::class, 'verify'])->name('donations.verify');
 
