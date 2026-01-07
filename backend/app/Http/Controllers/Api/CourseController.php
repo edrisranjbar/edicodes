@@ -9,6 +9,8 @@ use App\Models\Enrollment;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -93,6 +95,9 @@ class CourseController extends Controller
         }
 
         $course = Course::create($validated);
+
+        // Regenerate sitemap after creating a course
+        $this->regenerateSitemap();
 
         return response()->json([
             'success' => true,
@@ -180,6 +185,9 @@ class CourseController extends Controller
 
         $course->update($validated);
 
+        // Regenerate sitemap after updating a course
+        $this->regenerateSitemap();
+
         return response()->json([
             'success' => true,
             'message' => 'دوره با موفقیت بروزرسانی شد',
@@ -199,6 +207,9 @@ class CourseController extends Controller
         $this->deleteThumbnail($course->thumbnail);
 
         $course->delete();
+
+        // Regenerate sitemap after deleting a course
+        $this->regenerateSitemap();
 
         return response()->json([
             'success' => true,
@@ -405,6 +416,30 @@ class CourseController extends Controller
             if ($content->video_path && Storage::exists($content->video_path)) {
                 Storage::delete($content->video_path);
             }
+        }
+    }
+
+    /**
+     * Regenerate sitemap in the background
+     */
+    private function regenerateSitemap()
+    {
+        // Run sitemap generation in the background to avoid blocking the response
+        try {
+            // Try to queue it first (if queue worker is running)
+            if (config('queue.default') !== 'sync') {
+                Artisan::queue('sitemap:generate');
+            } else {
+                // If sync queue, run it in background using exec
+                $artisanPath = base_path('artisan');
+                $command = PHP_OS_FAMILY === 'Windows' 
+                    ? "start /B php \"{$artisanPath}\" sitemap:generate > NUL 2>&1"
+                    : "php \"{$artisanPath}\" sitemap:generate > /dev/null 2>&1 &";
+                exec($command);
+            }
+        } catch (\Exception $e) {
+            // Log error but don't fail the request
+            Log::error('Failed to regenerate sitemap: ' . $e->getMessage());
         }
     }
 }

@@ -7,6 +7,8 @@ use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
@@ -80,6 +82,10 @@ class PostController extends Controller
         }
 
         $post = Post::create($validated);
+        
+        // Regenerate sitemap after creating a post
+        $this->regenerateSitemap();
+        
         return new PostResource($post->load('category'));
     }
 
@@ -143,6 +149,10 @@ class PostController extends Controller
         }
 
         $post->update($validated);
+        
+        // Regenerate sitemap after updating a post
+        $this->regenerateSitemap();
+        
         return new PostResource($post->load('category'));
     }
 
@@ -152,6 +162,34 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $post->delete();
+        
+        // Regenerate sitemap after deleting a post
+        $this->regenerateSitemap();
+        
         return response()->json(['message' => 'Post deleted successfully']);
+    }
+    
+    /**
+     * Regenerate sitemap in the background
+     */
+    private function regenerateSitemap()
+    {
+        // Run sitemap generation in the background to avoid blocking the response
+        try {
+            // Try to queue it first (if queue worker is running)
+            if (config('queue.default') !== 'sync') {
+                Artisan::queue('sitemap:generate');
+            } else {
+                // If sync queue, run it in background using exec
+                $artisanPath = base_path('artisan');
+                $command = PHP_OS_FAMILY === 'Windows' 
+                    ? "start /B php \"{$artisanPath}\" sitemap:generate > NUL 2>&1"
+                    : "php \"{$artisanPath}\" sitemap:generate > /dev/null 2>&1 &";
+                exec($command);
+            }
+        } catch (\Exception $e) {
+            // Log error but don't fail the request
+            Log::error('Failed to regenerate sitemap: ' . $e->getMessage());
+        }
     }
 }
