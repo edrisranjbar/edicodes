@@ -1,27 +1,12 @@
 <template>
   <div class="pt-16" dir="rtl">
-    <!-- Hero Section -->
     <HeroSection />
-
-    <!-- Journey Section -->
     <JourneySection />
-
-    <!-- About Me Section -->
     <AboutMeSection />
-
-    <!-- Projects Section -->
     <ProjectsSection />
-
-    <!-- Philosophy Section -->
     <PhilosophySection />
-
-    <!-- Blog Section -->
     <BlogSection />
-
-    <!-- Contact Section -->
     <ContactSection />
-
-    <!-- Donate Section -->
     <DonateSection />
   </div>
 </template>

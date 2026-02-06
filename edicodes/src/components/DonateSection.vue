@@ -4,7 +4,7 @@
       <div class="max-w-3xl mx-auto">
         <div class="text-center mb-8">
           <h2 class="text-4xl font-bold mb-4 font-vazir">
-            <span class="text-primary">حمایت</span> مالی
+            <span class="text-primary">حمایت</span> مالی (دونیت)
           </h2>
           <p class="text-white/70 mb-8">
             با حمایت مالی از من، به توسعه پروژه‌های متن‌باز و تولید محتوای آموزشی کمک کنید.
@@ -34,7 +34,7 @@
               <input
                 type="text"
                 v-model="name"
-                placeholder="نام شما (اختیاری)"
+                placeholder="نام (اختیاری)"
                 class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-primary transition-colors"
               />
             </div>
@@ -42,7 +42,7 @@
               <input
                 type="email"
                 v-model="email"
-                placeholder="ایمیل شما (اختیاری)"
+                placeholder="ایمیل (اختیاری)"
                 class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-primary transition-colors"
                 dir="ltr"
               />
