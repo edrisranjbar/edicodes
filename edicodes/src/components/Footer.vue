@@ -57,6 +57,12 @@
                 لینکدین
               </a>
             </li>
+            <li>
+              <a href="https://t.me/edrisranjbar" target="_blank" class="text-white/70 hover:text-white transition-colors duration-200 text-sm font-vazir flex items-center gap-2">
+                <font-awesome-icon :icon="['fab', 'telegram']" class="w-4 h-4" />
+                تلگرام
+              </a>
+            </li>
           </ul>
         </div>
 

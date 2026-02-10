@@ -13,6 +13,7 @@
       </transition>
     </router-view>
     <Footer v-if="!isAdminRoute" />
+    <TelegramBanner v-if="!isAdminRoute" />
   </div>
 </template>
 
@@ -21,6 +22,7 @@ import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
+import TelegramBanner from '@/components/TelegramBanner.vue'
 
 const route = useRoute()
 
