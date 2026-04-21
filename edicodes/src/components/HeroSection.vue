@@ -4,7 +4,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <!-- Text Content -->
         <div class="text-center lg:text-right space-y-8">
-          <div class="space-y-4">
+          <div class="space-y-7">
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold font-vazir">
               <span class="text-primary">ادریس رنجبر</span>
             </h1>
@@ -15,9 +15,8 @@
           </div>
           
           <p class="text-base sm:text-lg text-white/60 leading-relaxed font-vazir max-w-2xl">
-            سلام! <span class="inline-block animate-wave">👋</span> من عاشق برنامه‌نویسیم و 9 ساله که با PHP و Python سروکار دارم.
+            سلام! <span class="inline-block animate-wave">👋</span> من ادریسم، برنامه نویس و علاقه مند به لینوکس و دنیای نرم‌افزار. ده ساله که با PHP و Python سروکار دارم.
              اینجا تجربیاتم رو به اشتراک می‌ذارم و از آشنایی با برنامه‌نویس‌های جدید خوشحال میشم! 
-            <span class="inline-block">✨</span>
           </p>
           
           <div class="flex flex-wrap gap-4 justify-center lg:justify-start pt-4">

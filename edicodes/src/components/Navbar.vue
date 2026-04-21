@@ -26,14 +26,14 @@
             <font-awesome-icon icon="book" class="ml-1.5" />
             وبلاگ
           </router-link>
-          <router-link
+          <!-- <router-link
             to="/courses"
             class="nav-link"
             :class="{ 'active': $route.path === '/courses' }"
           >
             <font-awesome-icon icon="graduation-cap" class="ml-1.5" />
             دوره های آموزشی
-          </router-link>
+          </router-link> -->
           <router-link 
             to="/#projects" 
             class="nav-link" 

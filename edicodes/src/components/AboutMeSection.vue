@@ -41,61 +41,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Skills Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Laravel -->
-            <div class="bg-black/20 backdrop-blur-sm rounded-xl p-6 border border-white/5 hover:border-primary/50 transition-all duration-300 group">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <font-awesome-icon icon="server" class="text-2xl text-primary" />
-                </div>
-                <h3 class="text-xl font-bold text-white">لاراول</h3>
-              </div>
-              <p class="text-white/70">
-                توسعه اپلیکیشن‌های وب مقیاس‌پذیر با استفاده از فریم‌ورک لاراول و بهترین شیوه‌های برنامه‌نویسی
-              </p>
-            </div>
-
-            <!-- Django -->
-            <div class="bg-black/20 backdrop-blur-sm rounded-xl p-6 border border-white/5 hover:border-primary/50 transition-all duration-300 group">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <font-awesome-icon icon="database" class="text-2xl text-primary" />
-                </div>
-                <h3 class="text-xl font-bold text-white">جنگو</h3>
-              </div>
-              <p class="text-white/70">
-                ساخت API‌ها و سرویس‌های وب با استفاده از فریم‌ورک جنگو و DRF
-              </p>
-            </div>
-
-            <!-- SQL -->
-            <div class="bg-black/20 backdrop-blur-sm rounded-xl p-6 border border-white/5 hover:border-primary/50 transition-all duration-300 group">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <font-awesome-icon icon="diagram-project" class="text-2xl text-primary" />
-                </div>
-                <h3 class="text-xl font-bold text-white">SQL</h3>
-              </div>
-              <p class="text-white/70">
-                طراحی و بهینه‌سازی پایگاه‌های داده با تمرکز بر عملکرد و مقیاس‌پذیری
-              </p>
-            </div>
-
-            <!-- Vue.js -->
-            <div class="bg-black/20 backdrop-blur-sm rounded-xl p-6 border border-white/5 hover:border-primary/50 transition-all duration-300 group">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <font-awesome-icon icon="code" class="text-2xl text-primary" />
-                </div>
-                <h3 class="text-xl font-bold text-white">ویو جی‌اس</h3>
-              </div>
-              <p class="text-white/70">
-                توسعه رابط‌های کاربری تعاملی و واکنش‌گرا با Vue.js
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
