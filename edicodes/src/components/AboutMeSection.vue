@@ -23,7 +23,7 @@
               <div class="overflow-x-auto">
                 <pre class="text-xs sm:text-base font-mono leading-relaxed text-left min-w-[300px]"><span class="text-purple-400">const</span> <span class="text-green-400">edris</span> = {
   <span class="text-purple-400">role</span>: <span class="text-orange-400">"Backend Dev"</span>,
-  <span class="text-purple-400">experience</span>: <span class="text-purple-400">9</span>,
+  <span class="text-purple-400">experience</span>: <span class="text-purple-400">10</span>,
   <span class="text-purple-400">company</span>: <span class="text-orange-400">"Itadbeer"</span>,
   <span class="text-purple-400">skills</span>: [
     <span class="text-orange-400">"PHP"</span>,
