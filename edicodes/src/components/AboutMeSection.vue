@@ -13,8 +13,9 @@
                 سلام 👋
               </p>
               <p class="text-white/70 leading-relaxed font-vazir text-right text-lg">
-                من یک توسعه‌دهنده بک‌اند با تجربه در زبان‌های برنامه‌نویسی PHP و Python هستم. ۹ سال است که در حال کدنویسی هستم و درک عمیقی از توسعه وب دارم. به صورت دورکار به عنوان توسعه‌دهنده فریلنسر کار می‌کنم و همیشه به دنبال فرصت‌های جدید برای ارتقای مهارت‌ها و دانش خود هستم. اگر تمایل به همکاری دارید، لطفاً با من در تماس باشید.
-              </p>
+من ادریس رنجبر، توسعه‌دهنده بک‌اند، فریلنسر با تجربه در زبان‌های برنامه‌نویسی PHP و Python هستم. از شانزده سالگی به مدت ۱۰ ساله که در حال کدنویسی هستم و به واسطه پروژه های زیادی که در طول سال‌ها انجام داده‌ام درک خوبی از توسعه وب و برنامه نویسی دارم. به صورت دورکاری به عنوان توسعه‌دهنده فریلنسر کار می‌کنم و به دنبال فرصت‌های جدید مناسب شغلی هستم.
+بخشی از کارم تدریس به صورت آنلاین و حضوری هست و تجربه برگذاری چندین دوره برنامه نویسی و طراحی سایت دارم. برخی از مهم ترین علاقه مندی های من عبارتند از: سیستم عامل لینوکس، دنیای نرم افزار آزاد، توسعه نرم افزار و اشعار مولانا هستند.
+تخصص اصلی من توسعه API، برنامه نویسی سمت سرور و توسعه وب سایت است. در زیر شما بخشی از مهارت ها و تخصص های اصلی من رو می‌بینید.              </p>
             </div>
 
             <!-- Code Summary -->
@@ -26,10 +27,10 @@
   <span class="text-purple-400">experience</span>: <span class="text-purple-400">10</span>,
   <span class="text-purple-400">company</span>: <span class="text-orange-400">"Itadbeer"</span>,
   <span class="text-purple-400">skills</span>: [
-    <span class="text-orange-400">"PHP"</span>,
-    <span class="text-orange-400">"Python"</span>,
-    <span class="text-orange-400">"Backend"</span>,
-    <span class="text-orange-400">"Web Dev"</span>
+    <span class="text-orange-400">"Programming"</span>,
+    <span class="text-orange-400">"Linux"</span>,
+    <span class="text-orange-400">"API design"</span>,
+    <span class="text-orange-400">"Web Development"</span>
   ],
   <span class="text-purple-400">values</span>: [
     <span class="text-orange-400">"Remote"</span>,
