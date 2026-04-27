@@ -41,9 +41,9 @@
         <!-- Profile Image -->
         <div class="relative order-first lg:order-last">
           <img
-            src="@/assets/images/profile.png"
+            src="@/assets/images/hero.jpg"
             alt="ادریس رنجبر"
-            class="w-64 sm:w-80 md:w-96 lg:w-full max-w-lg mx-auto rounded-2xl shadow-xl"
+            class="w-48 sm:w-64 md:w-80 lg:w-96 max-w-md mx-auto rounded-2xl shadow-xl"
             loading="eager"
           />
           <!-- Decorative Elements -->
