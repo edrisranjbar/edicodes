@@ -251,14 +251,22 @@ onMounted(async () => {
 
 .blog-content pre {
   @apply my-6 p-4 bg-black/50 rounded-lg border border-white/10 overflow-x-auto;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
 }
 
 .blog-content code {
   @apply font-mono text-primary-light text-sm;
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 .blog-content pre code {
   @apply text-white/80;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
 }
 
 .blog-content a {
