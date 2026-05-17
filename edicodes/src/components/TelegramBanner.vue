@@ -1,6 +1,6 @@
 <template>
   <a
-    href="https://t.me/edrisranjbar"
+    href="https://t.me/edi_codes"
     target="_blank"
     rel="noopener noreferrer"
     class="telegram-banner fixed bottom-4 left-4 z-[100] flex items-center gap-2 bg-[#229ED9] text-white px-4 py-3 rounded-full shadow-lg hover:bg-[#1b8bc2] transition-all duration-300 hover:scale-105 group"
