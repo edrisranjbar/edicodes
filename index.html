@@ -1,239 +1,569 @@
-<!DOCTYPE html>
-<html lang="en" class="js">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Edris Ranjbar — Back-End Developer & Co-founder | Laravel, DRF, SQL</title>
-  <meta name="description" content="Edris Ranjbar is a back-end developer and co-founder of Itadbeer, specializing in Laravel, DRF, SQL and building robust, scalable backend systems." />
-  <meta name="author" content="Edris Ranjbar" />
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edris Ranjbar — Back-End Developer & Co-founder</title>
+    <meta
+      name="description"
+      content="Edris Ranjbar is a back-end developer and co-founder of Itadbeer, specializing in Laravel, DRF, SQL and building robust, scalable backend systems."
+    />
+    <meta
+      property="og:title"
+      content="Edris Ranjbar — Back-End Developer & Co-founder"
+    />
+    <meta
+      property="og:description"
+      content="Backend developer crafting efficient, scalable systems. Laravel, DRF, SQL."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="cursor-blob" id="cursorBlob" aria-hidden="true"></div>
+    <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Edris Ranjbar — Back-End Developer & Co-founder" />
-  <meta property="og:description" content="Back-end developer crafting efficient, scalable systems. Laravel, DRF, SQL." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="assets/edris.png" />
+    <!-- NAV -->
+    <header class="nav" id="nav">
+      <div class="nav-inner">
+        <a href="#home" class="logo">ER<span class="logo-dot">.</span></a>
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#about">About</a>
+          <a href="#skills">Skills</a>
+          <a href="#experience">Experience</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <a href="mailto:edris.qeshm2@gmail.com" class="nav-cta">Hire me</a>
+        <button
+          class="burger"
+          id="burger"
+          aria-label="Open menu"
+          aria-expanded="false"
+        >
+          <span></span><span></span>
+        </button>
+      </div>
+    </header>
 
-  <!-- Fonts: JetBrains Mono (headings) + Work Sans (body) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <!-- Ambient background -->
-  <div class="bg-fx" aria-hidden="true">
-    <span class="orb orb-1"></span>
-    <span class="orb orb-2"></span>
-    <span class="grid-overlay"></span>
-  </div>
-
-  <!-- NAVBAR -->
-  <header class="nav" id="nav">
-    <div class="container nav-inner">
-      <a href="#home" class="logo"><span>&lt;</span>Edris Ranjbar<span>/&gt;</span></a>
-      <nav class="nav-links" aria-label="Primary">
-        <a href="#about">About</a>
-        <a href="#skills">Skills</a>
-        <a href="#experience">Experience</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#experience">Experience</a>
+      <a href="#contact">Contact</a>
     </div>
-  </header>
 
-  <!-- MOBILE MENU -->
-  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <a href="#about">About</a>
-    <a href="#skills">Skills</a>
-    <a href="#experience">Experience</a>
-    <a href="#contact">Contact</a>
-  </div>
+    <main>
+      <!-- HERO -->
+      <section class="hero" id="home">
+        <div class="hero-top">
+          <span class="hero-tag mono">&lt;Backend Developer /&gt;</span>
+        </div>
 
-  <main>
-    <!-- HERO -->
-    <section class="hero" id="home">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <span class="chip reveal">Hello, I'm</span>
-          <h1 class="reveal">Edris Ranjbar</h1>
-          <h2 class="reveal">Back-End Developer &amp; Co-founder of <em>Itadbeer</em></h2>
-          <p class="reveal">
-            I craft efficient, scalable backend solutions that power modern applications.
-            Passionate about clean code, performance optimization, and solving complex problems.
-          </p>
-          <div class="hero-actions reveal">
-            <a href="#contact" class="btn btn-primary">Contact me <span class="arrow">→</span></a>
-            <a href="#skills" class="btn btn-ghost">View skills</a>
+        <div class="hero-name-wrap">
+          <div class="hero-name-line">
+            <span class="hero-char">E</span><span class="hero-char">D</span
+            ><span class="hero-char">R</span><span class="hero-char">I</span
+            ><span class="hero-char">S</span>
+          </div>
+          <div class="hero-name-line line-2">
+            <span class="hero-char">R</span><span class="hero-char">A</span
+            ><span class="hero-char">N</span><span class="hero-char">J</span
+            ><span class="hero-char">B</span><span class="hero-char">A</span
+            ><span class="hero-char">R</span>
           </div>
         </div>
-        <div class="hero-photo reveal">
-          <div class="photo-frame">
-            <img src="assets/edris.png" alt="Portrait of Edris Ranjbar" loading="eager" />
-          </div>
-          <div class="status-card">
-            <span class="status-label">// current status</span>
-            <span class="status-row"><i class="dot"></i> Available for new projects</span>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- ABOUT -->
-    <section class="section" id="about">
-      <div class="container">
-        <div class="section-head reveal">
-          <h2 class="section-title">About Me</h2>
-          <p class="lead">
-            Hi there ✋, I am a back-end developer with experience in PHP and Python.
-            I've been coding for 11 years with a strong understanding of web development.
-            I work remotely as a freelance developer and I'm always seeking new opportunities
-            to enhance my skills. If you'd like to work together, feel free to contact me.
-          </p>
-        </div>
-
-        <div class="cards-3">
-          <article class="card reveal">
-            <div class="card-icon">🖥️</div>
-            <h3>Backend Development</h3>
-            <p>Expert in designing scalable server-side architectures, RESTful APIs, and microservices.</p>
-          </article>
-          <article class="card reveal">
-            <div class="card-icon">🗄️</div>
-            <h3>Database Design</h3>
-            <p>Skilled in optimizing schemas, query performance, and data persistence strategies.</p>
-          </article>
-          <article class="card reveal">
-            <div class="card-icon">🧩</div>
-            <h3>System Architecture</h3>
-            <p>Experienced in distributed systems, cloud infrastructure, and DevOps implementation.</p>
-          </article>
-        </div>
-
-        <div class="about-grid">
-          <div class="reveal">
-            <h3 class="sub-title">My Journey</h3>
-            <p>My passion for coding began over 11 years ago, evolving from simple scripts to complex
-              backend systems that power modern applications at scale. I've developed deep expertise
-              in PHP and Python technologies and architectural patterns.</p>
-            <p>As a co-founder of <strong>Itadbeer</strong>, I've built technology solutions from the
-              ground up, balancing technical excellence with business objectives to deliver products
-              that truly make an impact.</p>
-            <p>I work remotely as a freelance developer and I believe in continuous learning, staying
-              at the forefront of technology trends.</p>
-          </div>
-          <div class="code-card reveal">
-            <pre><code><span class="c-com">// professional summary</span>
-<span class="c-kw">const</span> <span class="c-fn">edris</span> = {
-  <span class="c-prop">role</span>: <span class="c-str">"Backend Developer & Co-founder"</span>,
-  <span class="c-prop">experience</span>: <span class="c-num">11</span>,
-  <span class="c-prop">company</span>: <span class="c-str">"Itadbeer"</span>,
-  <span class="c-prop">skills</span>: [<span class="c-str">"PHP"</span>, <span class="c-str">"Python"</span>, <span class="c-str">"Backend"</span>],
-  <span class="c-prop">values</span>: [<span class="c-str">"Remote"</span>, <span class="c-str">"Freelancing"</span>, <span class="c-str">"Learning"</span>]
-}</code></pre>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SKILLS -->
-    <section class="section alt" id="skills">
-      <div class="container">
-        <div class="section-head reveal">
-          <h2 class="section-title">Skills &amp; Expertise</h2>
-          <p class="lead">My technical toolkit is focused on building robust, scalable backend systems.</p>
-        </div>
-
-        <div class="skills-grid">
-          <div class="card reveal">
-            <h3 class="sub-title">Core Competencies</h3>
-            <div class="bars" id="bars">
-              <div class="bar" data-level="9"><div class="bar-top"><span>Programming</span><span>90%</span></div><div class="track"><i></i></div></div>
-              <div class="bar" data-level="8"><div class="bar-top"><span>API Development</span><span>80%</span></div><div class="track"><i></i></div></div>
-              <div class="bar" data-level="7"><div class="bar-top"><span>Database Engineering</span><span>70%</span></div><div class="track"><i></i></div></div>
-              <div class="bar" data-level="7"><div class="bar-top"><span>System Architecture</span><span>70%</span></div><div class="track"><i></i></div></div>
-              <div class="bar" data-level="6"><div class="bar-top"><span>Linux Administration</span><span>60%</span></div><div class="track"><i></i></div></div>
-              <div class="bar" data-level="5.5"><div class="bar-top"><span>Version Control</span><span>55%</span></div><div class="track"><i></i></div></div>
+        <div class="hero-bottom">
+          <div class="hero-desc">
+            <p>
+              I craft efficient, scalable backend systems. Co-founder of
+              <em>Itadbeer</em>. 11 years turning complex problems into clean,
+              performant code.
+            </p>
+            <div class="hero-actions">
+              <a href="#contact" class="btn-primary">Start a project</a>
+              <a href="#about" class="btn-text">Learn more <span>↓</span></a>
             </div>
           </div>
-          <div class="card reveal">
-            <h3 class="sub-title">Technical Knowledge</h3>
-            <div class="tags">
-              <span>Laravel</span><span>DRF</span><span>SQL</span><span>Redis</span>
-              <span>VueJs</span><span>Bootstrap</span><span>Git</span>
-              <span>RESTful APIs</span><span>Unit Testing</span><span>Linux</span>
-              <span>Nginx</span><span>Security</span><span>Performance</span>
-              <span>Python</span><span>PHP</span><span>Flutter</span>
+          <div class="hero-meta">
+            <div class="meta-stack mono">REPLACED BY AI :)</div>
+          </div>
+        </div>
+
+        <div class="hero-scroll" aria-hidden="true">
+          <span class="scroll-line"></span>
+          <span class="scroll-text mono">scroll</span>
+        </div>
+      </section>
+
+      <!-- MARQUEE -->
+      <div class="marquee-wrap" aria-hidden="true">
+        <div class="marquee-track">
+          <span>Backend Engineering</span><span class="sep">✦</span>
+          <span>Laravel</span><span class="sep">✦</span> <span>Django REST</span
+          ><span class="sep">✦</span> <span>System Architecture</span
+          ><span class="sep">✦</span> <span>API Development</span
+          ><span class="sep">✦</span> <span>Database Design</span
+          ><span class="sep">✦</span> <span>Redis &amp; Caching</span
+          ><span class="sep">✦</span> <span>Backend Engineering</span
+          ><span class="sep">✦</span> <span>Laravel</span
+          ><span class="sep">✦</span> <span>Django REST</span
+          ><span class="sep">✦</span> <span>System Architecture</span
+          ><span class="sep">✦</span> <span>API Development</span
+          ><span class="sep">✦</span> <span>Database Design</span
+          ><span class="sep">✦</span>
+        </div>
+      </div>
+
+      <!-- ABOUT -->
+      <section class="section" id="about">
+        <div class="container">
+          <div class="section-label reveal">
+            <span class="num">01</span>
+            <span class="label-text mono">// about</span>
+          </div>
+
+          <div class="about-layout">
+            <div class="about-left reveal">
+              <h2 class="section-title">
+                Building the invisible infrastructure<br /><em
+                  >that powers the web.</em
+                >
+              </h2>
+            </div>
+            <div class="about-right">
+              <p class="reveal">
+                Hi there ✋ — I'm a backend developer with 11 years of
+                experience building robust server-side architectures. My
+                expertise spans PHP and Python, and I've shipped production
+                systems for startups and enterprises alike.
+              </p>
+              <p class="reveal">
+                As co-founder of <strong>Itadbeer</strong>, I built the
+                technical foundation from day one — architecting the SaaS
+                platform, managing engineering standards, and scaling
+                infrastructure to support real users.
+              </p>
+              <p class="reveal">
+                I work remotely as a freelance developer and thrive in
+                environments that reward curiosity and craftsmanship.
+              </p>
+
+              <div class="about-cards reveal">
+                <div class="about-card">
+                  <div class="ac-icon">🖥️</div>
+                  <div>
+                    <h4>Backend Dev</h4>
+                    <p>Scalable APIs &amp; microservices</p>
+                  </div>
+                </div>
+                <div class="about-card">
+                  <div class="ac-icon">🗄️</div>
+                  <div>
+                    <h4>Database Design</h4>
+                    <p>Schema optimization &amp; performance</p>
+                  </div>
+                </div>
+                <div class="about-card">
+                  <div class="ac-icon">🧩</div>
+                  <div>
+                    <h4>Architecture</h4>
+                    <p>Distributed systems &amp; DevOps</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="code-showcase reveal">
+            <div class="code-header">
+              <div class="code-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="mono code-filename">edris.ts</span>
+            </div>
+            <pre
+              class="code-body"
+            ><code><span class="c-com">// professional summary</span>
+<span class="c-kw">const</span> <span class="c-fn">edris</span><span class="c-punct">:</span> <span class="c-type">Developer</span> <span class="c-punct">=</span> <span class="c-punct">{</span>
+  <span class="c-prop">role</span><span class="c-punct">:</span>       <span class="c-str">"Backend Developer &amp; Co-founder"</span><span class="c-punct">,</span>
+  <span class="c-prop">experience</span><span class="c-punct">:</span> <span class="c-num">11</span><span class="c-punct">,</span>  <span class="c-com">// years</span>
+  <span class="c-prop">company</span><span class="c-punct">:</span>    <span class="c-str">"Itadbeer"</span><span class="c-punct">,</span>
+  <span class="c-prop">stack</span><span class="c-punct">:</span>      <span class="c-punct">[</span><span class="c-str">"Laravel"</span><span class="c-punct">,</span> <span class="c-str">"DRF"</span><span class="c-punct">,</span> <span class="c-str">"SQL"</span><span class="c-punct">,</span> <span class="c-str">"Redis"</span><span class="c-punct">]</span><span class="c-punct">,</span>
+  <span class="c-prop">openTo</span><span class="c-punct">:</span>     <span class="c-str">"Remote &amp; Freelance"</span><span class="c-punct">,</span>
+  <span class="c-prop">status</span><span class="c-punct">:</span>     <span class="c-green">"available"</span>
+<span class="c-punct">};</span></code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- SKILLS -->
+      <section class="section section-dark" id="skills">
+        <div class="container">
+          <div class="section-label reveal">
+            <span class="num">02</span>
+            <span class="label-text mono">// skills &amp; expertise</span>
+          </div>
+
+          <h2 class="section-title reveal">My technical <em>toolkit.</em></h2>
+
+          <div class="skills-layout">
+            <div class="bars-section reveal">
+              <h3 class="sub-heading">Core competencies</h3>
+              <div class="bars" id="bars">
+                <div class="bar-item" data-level="90">
+                  <div class="bar-label">
+                    <span>Programming</span
+                    ><span class="mono bar-pct">90%</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill"></div></div>
+                </div>
+                <div class="bar-item" data-level="80">
+                  <div class="bar-label">
+                    <span>API Development</span
+                    ><span class="mono bar-pct">80%</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill"></div></div>
+                </div>
+                <div class="bar-item" data-level="70">
+                  <div class="bar-label">
+                    <span>Database Engineering</span
+                    ><span class="mono bar-pct">70%</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill"></div></div>
+                </div>
+                <div class="bar-item" data-level="70">
+                  <div class="bar-label">
+                    <span>System Architecture</span
+                    ><span class="mono bar-pct">70%</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill"></div></div>
+                </div>
+                <div class="bar-item" data-level="60">
+                  <div class="bar-label">
+                    <span>Linux Administration</span
+                    ><span class="mono bar-pct">60%</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill"></div></div>
+                </div>
+                <div class="bar-item" data-level="55">
+                  <div class="bar-label">
+                    <span>Version Control</span
+                    ><span class="mono bar-pct">55%</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tech-section reveal">
+              <h3 class="sub-heading">Technologies</h3>
+              <div class="tech-tags">
+                <span class="tag">Laravel</span>
+                <span class="tag">DRF</span>
+                <span class="tag tag-accent">SQL</span>
+                <span class="tag">Redis</span>
+                <span class="tag">VueJs</span>
+                <span class="tag">Bootstrap</span>
+                <span class="tag tag-accent">Git</span>
+                <span class="tag">RESTful APIs</span>
+                <span class="tag">Unit Testing</span>
+                <span class="tag">Linux</span>
+                <span class="tag">Nginx</span>
+                <span class="tag tag-accent">PHP</span>
+                <span class="tag tag-accent">Python</span>
+                <span class="tag">Flutter</span>
+                <span class="tag">Security</span>
+                <span class="tag">Performance</span>
+              </div>
+
+              <h3 class="sub-heading" style="margin-top: 2.5rem">Philosophy</h3>
+              <div class="phil-list">
+                <div class="phil-item">
+                  <span class="phil-icon">⚙️</span>
+                  <div>
+                    <h4>Clean Architecture</h4>
+                    <p>SOLID principles, maintainable code, no shortcuts.</p>
+                  </div>
+                </div>
+                <div class="phil-item">
+                  <span class="phil-icon">⚡</span>
+                  <div>
+                    <h4>Performance First</h4>
+                    <p>Optimization built in — not bolted on after launch.</p>
+                  </div>
+                </div>
+                <div class="phil-item">
+                  <span class="phil-icon">🛡️</span>
+                  <div>
+                    <h4>Security Focused</h4>
+                    <p>Data protection and secure defaults from line one.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="card philosophy reveal">
-          <h3 class="sub-title">Development Philosophy</h3>
-          <div class="cards-3 inner">
-            <div class="phil"><div class="phil-icon">⚙️</div><h4>Clean Architecture</h4><p>Well-organized, maintainable code following SOLID principles.</p></div>
-            <div class="phil"><div class="phil-icon">⚡</div><h4>Performance First</h4><p>Optimizing for speed and efficiency is built into my workflow.</p></div>
-            <div class="phil"><div class="phil-icon">🛡️</div><h4>Security Focused</h4><p>Security best practices from day one, data protection as a priority.</p></div>
+      <!-- EXPERIENCE -->
+      <section class="section" id="experience">
+        <div class="container">
+          <div class="section-label reveal">
+            <span class="num">03</span>
+            <span class="label-text mono">// experience</span>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- EXPERIENCE -->
-    <section class="section" id="experience">
-      <div class="container">
-        <div class="section-head reveal">
-          <h2 class="section-title">Experience</h2>
-          <p class="lead">My professional journey building backend systems and growing as a developer.</p>
-        </div>
-        <div class="timeline">
-          <div class="t-item reveal">
-            <span class="t-dot current"></span>
-            <div class="card">
-              <span class="t-year">Jun 2022 - Present</span>
-              <h3>Co-founder &amp; Software Engineer</h3>
-              <h4>Itadbeer</h4>
-              <p>Leading technical strategy and development. Architected and implemented the core platform
-                powering our SaaS offerings, managing a team of developers and establishing technical standards.</p>
+          <h2 class="section-title reveal">
+            Where I've <em>shipped things.</em>
+          </h2>
+
+          <div class="exp-list">
+            <div class="exp-item reveal">
+              <div class="exp-left">
+                <span class="exp-year mono">2022 — Now</span>
+                <span class="exp-badge">Current</span>
+              </div>
+              <div class="exp-right">
+                <h3>Co-founder &amp; Software Engineer</h3>
+                <h4>Itadbeer</h4>
+                <p>
+                  Led all technical decisions from ground zero. Designed and
+                  built the core SaaS platform, defined engineering standards,
+                  managed developers, and shipped the infrastructure that drives
+                  the product.
+                </p>
+                <div class="exp-tags">
+                  <span>Laravel</span><span>DRF</span><span>PostgreSQL</span
+                  ><span>Redis</span><span>Vue.js</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="exp-item reveal">
+              <div class="exp-left">
+                <span class="exp-year mono">2020 — 2022</span>
+              </div>
+              <div class="exp-right">
+                <h3>Backend Developer</h3>
+                <h4>Freelancer</h4>
+                <p>
+                  Built and maintained API services, web applications, and
+                  client websites across multiple industries. Delivered
+                  full-stack solutions with a focus on backend reliability and
+                  clean code.
+                </p>
+                <div class="exp-tags">
+                  <span>PHP</span><span>Python</span><span>MySQL</span
+                  ><span>REST APIs</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="t-item reveal">
-            <span class="t-dot"></span>
-            <div class="card">
-              <span class="t-year">Jul 2020 - 2022</span>
-              <h3>Backend Developer</h3>
-              <h4>Freelancer</h4>
-              <p>Developed and maintained API services, web applications and websites as a full-stack developer.</p>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="section section-contact" id="contact">
+        <div class="container">
+          <div class="section-label reveal">
+            <span class="num">04</span>
+            <span class="label-text mono">// contact</span>
+          </div>
+
+          <div class="contact-layout">
+            <div class="contact-left reveal">
+              <h2 class="section-title">
+                Let's build something <em>great together.</em>
+              </h2>
+              <p>
+                Whether you have a project in mind, a role to fill, or just want
+                to talk backend architecture — my inbox is open.
+              </p>
+            </div>
+            <div class="contact-right reveal">
+              <a href="mailto:edris.qeshm2@gmail.com" class="contact-card">
+                <span class="contact-icon">✉️</span>
+                <div>
+                  <h4>Email</h4>
+                  <span class="mono small">edris.qeshm2@gmail.com</span>
+                </div>
+                <span class="contact-arrow">→</span>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/edrisranjbar"
+                target="_blank"
+                rel="noopener"
+                class="contact-card"
+              >
+                <span class="contact-icon contact-icon-text">in</span>
+                <div>
+                  <h4>LinkedIn</h4>
+                  <span class="mono small">edrisranjbar</span>
+                </div>
+                <span class="contact-arrow">→</span>
+              </a>
+              <a
+                href="https://github.com/edrisranjbar"
+                target="_blank"
+                rel="noopener"
+                class="contact-card"
+              >
+                <span class="contact-icon contact-icon-text">GH</span>
+                <div>
+                  <h4>GitHub</h4>
+                  <span class="mono small">edrisranjbar</span>
+                </div>
+                <span class="contact-arrow">→</span>
+              </a>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
 
-    <!-- CONTACT -->
-    <section class="section alt" id="contact">
-      <div class="container center">
-        <h2 class="section-title reveal">Get in Touch</h2>
-        <p class="lead reveal">Feel free to reach out through any of these platforms. I'm always open to
-          discussing new projects, opportunities, or just having a chat.</p>
-        <div class="contacts reveal">
-          <a href="mailto:edris.qeshm2@gmail.com" class="contact"><span class="ci">✉️</span><span>Email</span></a>
-          <a href="https://www.linkedin.com/in/edrisranjbar" target="_blank" rel="noopener" class="contact"><span class="ci">in</span><span>LinkedIn</span></a>
-          <a href="https://github.com/edrisranjbar" target="_blank" rel="noopener" class="contact"><span class="ci">GH</span><span>GitHub</span></a>
+    <footer class="footer">
+      <div class="container footer-inner">
+        <span class="logo">ER<span class="logo-dot">.</span></span>
+        <p class="mono footer-copy">
+          © <span id="year"></span> Edris Ranjbar — Built with ☕
+        </p>
+        <div class="footer-links">
+          <a
+            href="https://github.com/edrisranjbar"
+            target="_blank"
+            rel="noopener"
+            >GitHub</a
+          >
+          <a
+            href="https://www.linkedin.com/in/edrisranjbar"
+            target="_blank"
+            rel="noopener"
+            >LinkedIn</a
+          >
         </div>
       </div>
-    </section>
-  </main>
+    </footer>
 
-  <footer class="footer">
-    <div class="container">
-      <span class="logo"><span>&lt;</span>Edris Ranjbar<span>/&gt;</span></span>
-      <p>© <span id="year"></span> Edris Ranjbar. Built with ☕ and ❤️</p>
-    </div>
-  </footer>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
 
-  <script src="script.js" defer></script>
-</body>
+      // Custom cursor
+      const blob = document.getElementById("cursorBlob");
+      const dot = document.getElementById("cursorDot");
+      let mx = window.innerWidth / 2,
+        my = window.innerHeight / 2;
+      let bx = mx,
+        by = my;
+      const isMobile = window.innerWidth < 768;
+      if (!isMobile) {
+        document.addEventListener("mousemove", (e) => {
+          mx = e.clientX;
+          my = e.clientY;
+          dot.style.transform = `translate(${mx - 4}px,${my - 4}px)`;
+          dot.style.opacity = "1";
+        });
+        function animBlob() {
+          bx += (mx - bx) * 0.08;
+          by += (my - by) * 0.08;
+          blob.style.transform = `translate(${bx - 200}px,${by - 200}px)`;
+          requestAnimationFrame(animBlob);
+        }
+        animBlob();
+
+        // Hide default cursor
+        document.documentElement.style.cursor = "none";
+        document
+          .querySelectorAll("a, button")
+          .forEach((el) => (el.style.cursor = "none"));
+      }
+
+      // Nav scroll
+      const nav = document.getElementById("nav");
+      window.addEventListener("scroll", () => {
+        nav.classList.toggle("scrolled", window.scrollY > 60);
+      });
+
+      // Burger
+      const burger = document.getElementById("burger");
+      const mobileMenu = document.getElementById("mobileMenu");
+      burger.addEventListener("click", () => {
+        const open = mobileMenu.classList.toggle("open");
+        burger.classList.toggle("open", open);
+        burger.setAttribute("aria-expanded", open);
+      });
+      mobileMenu.querySelectorAll("a").forEach((a) =>
+        a.addEventListener("click", () => {
+          mobileMenu.classList.remove("open");
+          burger.classList.remove("open");
+          burger.setAttribute("aria-expanded", false);
+        }),
+      );
+
+      // Reveal on scroll
+      const revealEls = document.querySelectorAll(".reveal");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("in");
+              observer.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.1 },
+      );
+      revealEls.forEach((el) => observer.observe(el));
+
+      // Skill bars
+      const barsObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              document.querySelectorAll(".bar-item").forEach((bar, i) => {
+                const level = bar.dataset.level;
+                const fill = bar.querySelector(".bar-fill");
+                setTimeout(() => {
+                  fill.style.width = level + "%";
+                }, i * 80);
+              });
+              barsObserver.disconnect();
+            }
+          });
+        },
+        { threshold: 0.3 },
+      );
+      const barsEl = document.getElementById("bars");
+      if (barsEl) barsObserver.observe(barsEl);
+
+      // Hero chars stagger
+      document.querySelectorAll(".hero-char").forEach((c, i) => {
+        c.style.animationDelay = `${i * 0.055 + 0.15}s`;
+      });
+
+      // Magnetic buttons
+      document.querySelectorAll(".btn-primary, .nav-cta").forEach((btn) => {
+        btn.addEventListener("mousemove", (e) => {
+          const r = btn.getBoundingClientRect();
+          const x = ((e.clientX - r.left) / r.width - 0.5) * 16;
+          const y = ((e.clientY - r.top) / r.height - 0.5) * 16;
+          btn.style.transform = `translate(${x}px,${y}px)`;
+        });
+        btn.addEventListener("mouseleave", () => {
+          btn.style.transform = "";
+        });
+      });
+
+      // Reduced motion
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("no-motion");
+      }
+    </script>
+  </body>
 </html>
