@@ -4,7 +4,7 @@
     <div v-if="loading" class="container mx-auto px-4 sm:px-6 lg:px-8 py-32 flex justify-center">
       <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
     </div>
-    
+
     <!-- Error state -->
     <div v-else-if="error" class="container mx-auto px-4 sm:px-6 lg:px-8 py-32">
       <div class="max-w-xl mx-auto text-center">
@@ -20,7 +20,7 @@
         </router-link>
       </div>
     </div>
-    
+
     <!-- Post Content -->
     <div v-else class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <article class="max-w-4xl mx-auto">
@@ -28,8 +28,8 @@
         <header class="mb-12">
           <h1 class="text-4xl font-bold mb-6 font-vazir">{{ post.title }}</h1>
           <div class="flex items-center flex-wrap gap-4 text-white/50 font-vazir">
-            <router-link 
-              :to="`/blog?category=${post.category?.slug}`" 
+            <router-link
+              :to="`/blog?category=${post.category?.slug}`"
               class="rounded-full bg-primary/20 px-3 py-1 text-xs text-primary hover:bg-primary/30 transition-colors"
             >
               {{ post.category?.name || 'عمومی' }}
@@ -43,10 +43,10 @@
 
         <!-- Post Image -->
         <div class="relative rounded-lg overflow-hidden mb-12 bg-black/50">
-          <img 
-            :src="post.image || 'https://edrisranjbar.ir/images/blog/default.jpg'" 
-            :alt="post.title" 
-            class="w-full h-80 md:h-96 object-cover rounded-lg" 
+          <img
+            :src="post.image || 'https://edrisranjbar.ir/images/blog/default.jpg'"
+            :alt="post.title"
+            class="w-full h-80 md:h-96 object-cover rounded-lg"
             @error="handleImageError"
           />
           <div v-if="imageError" class="absolute inset-0 flex items-center justify-center">
@@ -56,7 +56,7 @@
 
         <!-- Post Content -->
         <div class="prose prose-invert prose-lg max-w-none font-vazir blog-content" v-html="post.content"></div>
-
+        <div id="pos-article-display-119873"></div>
         <!-- Donation Box -->
         <div class="mt-10 p-6 bg-black/40 rounded-2xl border border-white/10 text-center">
           <p class="mb-4 text-white/80 font-vazir">
@@ -80,7 +80,7 @@
             </router-link>
             <div class="flex gap-4 items-center">
               <span class="text-sm text-white/50">اشتراک گذاری:</span>
-              <a 
+              <a
                 :href="`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(currentUrl)}`"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -89,7 +89,7 @@
               >
                 <font-awesome-icon :icon="['fab', 'twitter']" />
               </a>
-              <a 
+              <a
                 :href="`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -98,7 +98,7 @@
               >
                 <font-awesome-icon :icon="['fab', 'linkedin']" />
               </a>
-              <a 
+              <a
                 :href="`https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(post.title)}`"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -110,7 +110,7 @@
             </div>
           </div>
         </footer>
-        
+
         <!-- Comments Section -->
         <CommentSection v-if="post.id" :post-id="post.id" />
       </article>
@@ -157,21 +157,21 @@ const fetchPost = async (slug) => {
   try {
     loading.value = true;
     error.value = null;
-    
+
     console.log('Fetching post with slug:', slug);
     const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/posts/slug/${slug}`);
-    
+
     console.log('API Response:', response.data);
-    
+
     // Check if response has data property (Laravel API Resource format)
     if (response.data && response.data.data) {
       // Extract the post data from the nested data property
       post.value = response.data.data;
       console.log('Post data:', post.value);
-      
+
       // Record page view
       await recordPageView(post.value.id);
-      
+
       // Update document title
       if (post.value.title) {
         document.title = `${post.value.title} | ادیکدز`;
@@ -181,18 +181,18 @@ const fetchPost = async (slug) => {
       router.replace({ name: 'not-found' });
       return;
     }
-    
+
     loading.value = false;
   } catch (err) {
     console.error('Error fetching post:', err);
-    
+
     // Check if it's a 404 error
     if (err.response && err.response.status === 404) {
       // Redirect to the 404 page
       router.replace({ name: 'not-found' });
       return;
     }
-    
+
     error.value = err.message || 'خطا در دریافت اطلاعات';
     loading.value = false;
   }
@@ -219,7 +219,7 @@ onMounted(async () => {
   if (typeof window !== 'undefined') {
     currentUrl.value = window.location.href;
   }
-  
+
   if (route.params.slug) {
     await fetchPost(route.params.slug);
   } else {
@@ -276,4 +276,4 @@ onMounted(async () => {
 .blog-content blockquote {
   @apply border-r-4 border-primary/50 pr-4 italic my-6 text-white/70;
 }
-</style> 
+</style>
