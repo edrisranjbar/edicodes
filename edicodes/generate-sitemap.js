@@ -1,36 +1,67 @@
 import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { SitemapStream, streamToPromise } from 'sitemap'
 import { Readable } from 'stream'
 import axios from 'axios'
 
-const API_URL = process.env.VITE_API_URL || 'http://localhost:8000'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const envPath = path.join(__dirname, '.env')
+
+if (fs.existsSync(envPath)) {
+  const envContents = fs.readFileSync(envPath, 'utf8')
+  envContents.split(/\r?\n/).forEach((line) => {
+    const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/)
+    if (!match) return
+
+    const key = match[1]
+    let value = match[2] || ''
+
+    if (value.startsWith('"') && value.endsWith('"')) {
+      value = value.slice(1, -1)
+    } else if (value.startsWith("'") && value.endsWith("'")) {
+      value = value.slice(1, -1)
+    }
+
+    value = value.trim()
+
+    if (process.env[key] === undefined) {
+      process.env[key] = value
+    }
+  })
+}
+
+const rawApiUrl =
+  process.env.VITE_API_BASE_URL || process.env.VITE_API_URL || 'http://localhost:8000/api'
+const API_URL = rawApiUrl.replace(/\/$/, '')
 
 async function fetchPostsList() {
   try {
-    const response = await axios.get(`${API_URL}/api/posts`)
+    const response = await axios.get(`${API_URL}/posts`)
     return response.data.data || []
   } catch (error) {
-    console.error('Error fetching posts:', error)
+    console.error('Error fetching posts:', error?.response?.data || error)
     return []
   }
 }
 
 async function fetchCategoriesList() {
   try {
-    const response = await axios.get(`${API_URL}/api/categories`)
+    const response = await axios.get(`${API_URL}/categories`)
     return response.data.data || []
   } catch (error) {
-    console.error('Error fetching categories:', error)
+    console.error('Error fetching categories:', error?.response?.data || error)
     return []
   }
 }
 
 async function fetchCoursesList() {
   try {
-    const response = await axios.get(`${API_URL}/api/courses`)
+    const response = await axios.get(`${API_URL}/courses`)
     return response.data.data || []
   } catch (error) {
-    console.error('Error fetching courses:', error)
+    console.error('Error fetching courses:', error?.response?.data || error)
     return []
   }
 }
