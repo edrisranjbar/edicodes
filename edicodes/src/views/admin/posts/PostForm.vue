@@ -44,17 +44,48 @@
         
         <div class="bg-black/50 rounded-lg border border-white/10 p-6">
           <label class="block text-white font-vazir mb-2">متن مطلب</label>
+          <div class="mb-4 flex flex-wrap items-center justify-end gap-3">
+            <div class="inline-flex rounded-lg border border-white/10 bg-black/20 p-1" role="group" aria-label="Editor mode">
+              <button
+                type="button"
+                class="rounded-md px-3 py-1.5 text-sm font-vazir transition-colors"
+                :class="editorMode === 'visual' ? 'bg-primary text-white' : 'text-white/70 hover:text-white'"
+                :aria-pressed="editorMode === 'visual'"
+                @click="editorMode = 'visual'"
+              >
+                Visual
+              </button>
+              <button
+                type="button"
+                class="rounded-md px-3 py-1.5 text-sm font-vazir transition-colors"
+                :class="editorMode === 'code' ? 'bg-primary text-white' : 'text-white/70 hover:text-white'"
+                :aria-pressed="editorMode === 'code'"
+                @click="editorMode = 'code'"
+              >
+                HTML / CSS
+              </button>
+            </div>
+          </div>
           <div
-            v-if="isEditing && !blockEditorReady"
+            v-if="editorMode === 'visual' && isEditing && !blockEditorReady"
             class="min-h-[18rem] rounded-lg border border-white/10 bg-black/20 flex items-center justify-center text-white/50 font-vazir text-sm"
           >
             در حال بارگذاری ویرایشگر…
           </div>
           <BlockEditor
-            v-else
+            v-else-if="editorMode === 'visual'"
+            :key="`visual-${editorInstance}`"
             v-model="post.content"
             :upload-url="uploadEndpoint"
             :auth-token="adminToken"
+          />
+          <textarea
+            v-else
+            v-model="post.content"
+            dir="ltr"
+            spellcheck="false"
+            class="min-h-[24rem] w-full resize-y rounded-lg border border-white/10 bg-black/30 p-4 font-mono text-sm leading-6 text-white/90 outline-none transition-colors focus:border-primary/60"
+            placeholder="<article class=&quot;custom-post&quot;>&#10;  <style>&#10;    .custom-post { /* styles */ }&#10;  </style>&#10;  <h2>Title</h2>&#10;  <p>Content</p>&#10;</article>"
           />
         </div>
       </div>
@@ -71,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import BlockEditor from '@/components/admin/BlockEditor.vue';
@@ -82,6 +113,8 @@ const router = useRouter();
 const error = ref('');
 const isSaving = ref(false);
 const categories = ref([]);
+const editorMode = ref('visual');
+const editorInstance = ref(0);
 /** Mount TipTap only after post HTML is loaded when editing — avoids empty→full setContent ProseMirror bugs */
 const blockEditorReady = ref(!route.params.id);
 
@@ -105,6 +138,13 @@ const post = ref({
 
 // Check if we're editing
 const isEditing = computed(() => !!route.params.id);
+
+watch(editorMode, (mode, previousMode) => {
+  // Recreate TipTap after code mode so it reads the latest raw HTML only when visual editing is requested.
+  if (mode === 'visual' && previousMode === 'code') {
+    editorInstance.value += 1;
+  }
+});
 
 // Format date for datetime-local input
 function formatDateTime(date) {
@@ -275,4 +315,4 @@ onMounted(async () => {
     await fetchPost(route.params.id);
   }
 });
-</script> 
+</script>
