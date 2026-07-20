@@ -121,4 +121,4 @@ onMounted(() => {
 .social-link {
   @apply px-6 py-3 bg-white/5 hover:bg-white/10 text-white/85 hover:text-white rounded-lg text-sm transition-all duration-200 border border-white/10 hover:border-primary/30;
 }
-</style> 
+</style>

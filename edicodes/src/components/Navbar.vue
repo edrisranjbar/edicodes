@@ -11,8 +11,8 @@
 
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center gap-2 mr-8">
-          <router-link 
-            to="/" 
+          <router-link
+            to="/"
             class="nav-link"
           >
             <font-awesome-icon icon="home" class="ml-1.5" />
@@ -34,34 +34,34 @@
             <font-awesome-icon icon="graduation-cap" class="ml-1.5" />
             دوره های آموزشی
           </router-link> -->
-          <router-link 
-            to="/#projects" 
-            class="nav-link" 
+          <router-link
+            to="/#projects"
+            class="nav-link"
             :class="{ 'active': $route.hash === '#projects' }"
           >
             <font-awesome-icon icon="code" class="ml-1.5" />
             پروژه‌های آزاد
           </router-link>
-          <router-link 
-            to="/#youtube" 
-            class="nav-link" 
+          <router-link
+            to="/#youtube"
+            class="nav-link"
             :class="{ 'active': $route.hash === '#youtube' }"
             @click="openYouTube"
           >
             <font-awesome-icon :icon="['fab', 'youtube']" class="ml-1.5" />
             یوتیوب
           </router-link>
-          <router-link 
-            to="/contact" 
-            class="nav-link" 
+          <router-link
+            to="/contact"
+            class="nav-link"
             :class="{ 'active': $route.path === '/contact' }"
           >
             <font-awesome-icon icon="paper-plane" class="ml-1.5" />
             تماس با من
           </router-link>
-          <router-link 
-            to="/donation" 
-            class="nav-link" 
+          <router-link
+            to="/donation"
+            class="nav-link"
             :class="{ 'active': $route.path === '/donation' }"
           >
             <font-awesome-icon icon="heart" class="ml-1.5" />
@@ -71,13 +71,13 @@
 
         <!-- Mobile menu button -->
         <div class="md:hidden mr-auto">
-          <button 
-            @click="isOpen = !isOpen" 
+          <button
+            @click="isOpen = !isOpen"
             class="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-xl border border-white/10"
           >
             <span class="sr-only">باز کردن منو</span>
-            <font-awesome-icon 
-              :icon="isOpen ? 'xmark' : 'bars'" 
+            <font-awesome-icon
+              :icon="isOpen ? 'xmark' : 'bars'"
               class="text-white/70 text-xl"
             />
           </button>
@@ -112,9 +112,9 @@
             <font-awesome-icon icon="code" class="ml-2" />
             پروژه‌های آزاد
           </router-link>
-          <router-link 
-            to="/#youtube" 
-            class="mobile-nav-link" 
+          <router-link
+            to="/#youtube"
+            class="mobile-nav-link"
             @click="openYouTubeAndCloseMenu"
           >
             <font-awesome-icon :icon="['fab', 'youtube']" class="ml-2" />
@@ -168,4 +168,4 @@ const openYouTubeAndCloseMenu = () => {
   @apply flex items-center px-4 py-3 text-base font-medium text-white/80 hover:text-white rounded-lg transition-all duration-200;
   @apply hover:bg-white/5 hover:backdrop-blur-xl hover:border hover:border-white/10;
 }
-</style> 
+</style>
