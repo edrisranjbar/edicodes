@@ -17,6 +17,8 @@ use App\Http\Controllers\Api\CourseContentController;
 use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\VideoStreamController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\YouTubeController;
+use App\Http\Controllers\Api\YouTubeVideoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +42,7 @@ Route::get('/donations/verify', [DonationController::class, 'verify'])->name('do
 // Test Resend Email (only in local/development environment)
 if (app()->environment(['local', 'development'])) {
     Route::get('/test-email', [TestResendController::class, 'testEmail']);
-    
+
     // Payment Test Routes (Development Only)
     Route::prefix('test')->group(function () {
         Route::get('/payment/methods', [PaymentController::class, 'getPaymentMethods']);
@@ -48,11 +50,11 @@ if (app()->environment(['local', 'development'])) {
             // Create a test enrollment for testing payments
             $course = \App\Models\Course::first();
             $user = \App\Models\User::first();
-            
+
             if (!$course || !$user) {
                 return response()->json(['error' => 'No course or user found'], 400);
             }
-            
+
             $enrollment = \App\Models\Enrollment::create([
                 'user_id' => $user->id,
                 'course_id' => $course->id,
@@ -60,7 +62,7 @@ if (app()->environment(['local', 'development'])) {
                 'payment_status' => 'pending',
                 'enrolled_at' => now()
             ]);
-            
+
             return response()->json([
                 'success' => true,
                 'enrollment' => $user->id,
@@ -79,10 +81,13 @@ Route::get('/health', function() {
     ]);
 });
 
-// Public Blog routes 
+// Public Blog routes
 Route::apiResource('categories', \App\Http\Controllers\Api\CategoryController::class)->only(['index', 'show']);
 Route::apiResource('posts', \App\Http\Controllers\Api\PostController::class)->only(['index', 'show']);
-Route::get('posts/slug/{slug}', [\App\Http\Controllers\Api\PostController::class, 'findBySlug']); 
+Route::get('posts/slug/{slug}', [\App\Http\Controllers\Api\PostController::class, 'findBySlug']);
+// YouTube feed (cached)
+Route::get('youtube/videos', [YouTubeController::class, 'index']);
+Route::get('youtube/carousel', [YouTubeVideoController::class, 'index']);
 
 // Comment Routes
 Route::post('/comments', [CommentController::class, 'store'])->middleware('throttle:3,5');
@@ -119,7 +124,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/enrollments/{enrollment}/create-payment', [PaymentController::class, 'createPayment']);
     Route::get('/enrollments/{enrollment}/payment-status', [PaymentController::class, 'checkStatus']);
     Route::post('/enrollments/{enrollment}/refund', [PaymentController::class, 'refund']);
-    
+
 
 });
 

@@ -6,6 +6,7 @@
     <ProjectsSection />
     <PhilosophySection />
     <BlogSection />
+    <YouTubeSection />
     <ContactSection />
     <DonateSection />
   </div>
@@ -13,6 +14,7 @@
 
 <script setup>
 import BlogSection from '@/components/BlogSection.vue'
+import YouTubeSection from '@/components/YouTubeSection.vue'
 import DonateSection from '@/components/DonateSection.vue'
 import HeroSection from '@/components/HeroSection.vue'
 import JourneySection from '@/components/JourneySection.vue'
