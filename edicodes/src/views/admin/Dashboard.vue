@@ -75,6 +75,7 @@
             <tr class="text-right border-b border-white/10">
               <th class="py-3 pr-3 text-sm font-vazir text-white/60 font-normal">عنوان</th>
               <th class="py-3 px-3 text-sm font-vazir text-white/60 font-normal">دسته‌بندی</th>
+              <th class="py-3 px-3 text-sm font-vazir text-white/60 font-normal">بازدید</th>
               <th class="py-3 px-3 text-sm font-vazir text-white/60 font-normal">تاریخ</th>
               <th class="py-3 pl-3 text-sm font-vazir text-white/60 font-normal">وضعیت</th>
             </tr>
@@ -88,6 +89,9 @@
                 <span class="inline-flex px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-vazir">
                   {{ post.category?.name || 'بدون دسته‌بندی' }}
                 </span>
+              </td>
+              <td class="py-4 px-3">
+                <div class="font-vazir text-white/70 text-sm">{{ getPostViews(post) }}</div>
               </td>
               <td class="py-4 px-3">
                 <div class="font-vazir text-white/70 text-sm">{{ formatDate(post.published_at) }}</div>
@@ -108,10 +112,7 @@
     <div class="rounded-lg bg-black/50 border border-white/10 p-6 mb-8">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-lg font-vazir text-white">خلاصه آمار بازدید</h2>
-        <router-link to="/admin/analytics"
-          class="text-primary text-sm hover:text-primary-light transition-colors duration-150 font-vazir">
-          مشاهده جزئیات
-        </router-link>
+        <ActionLink to="/admin/analytics">مشاهده جزئیات</ActionLink>
       </div>
 
       <div v-if="loading" class="flex justify-center py-6">
@@ -168,10 +169,7 @@
           <font-awesome-icon icon="comments" class="text-primary ml-2" />
           آخرین دیدگاه‌ها
         </h3>
-        <router-link to="/admin/comments"
-          class="bg-primary/10 hover:bg-primary/20 text-primary text-xs px-3 py-1 rounded-md font-vazir transition-colors">
-          مشاهده همه
-        </router-link>
+        <ActionLink to="/admin/comments" variant="badge">مشاهده همه</ActionLink>
       </div>
 
       <div class="divide-y divide-black/50">
@@ -241,10 +239,7 @@
           <font-awesome-icon icon="donate" class="text-purple-500 ml-2" />
           لیست حمایت‌های مالی
         </h3>
-        <router-link to="/admin/donations"
-          class="bg-purple-500/10 hover:bg-purple-500/20 text-purple-500 text-xs px-3 py-1 rounded-md font-vazir transition-colors">
-          مشاهده همه
-        </router-link>
+        <ActionLink to="/admin/donations" variant="badge">مشاهده همه</ActionLink>
       </div>
 
       <div class="divide-y divide-black/50">
@@ -335,6 +330,7 @@ import { API_URL } from '@/config';
 import { Line as LineChart } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import moment from 'moment-jalaali'
+import ActionLink from '@/components/admin/ActionLink.vue'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -368,6 +364,11 @@ const analytics = ref({ dailyViews: [] })
 const toPersianDigits = (str) => {
   const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
   return str.toString().replace(/[0-9]/g, (w) => persianDigits[+w])
+}
+
+const getPostViews = (post) => {
+  const v = post.views ?? post.view_count ?? post.views_count ?? 0
+  return toPersianDigits(v)
 }
 
 const formatChartLabel = (dateString) => {
@@ -507,7 +508,7 @@ const fetchDashboardData = async () => {
 
     // Update stats
     stats.value = response.data.stats;
-    
+
     // Update recent posts from dashboard data
     recentPosts.value = response.data.recentPosts || [];
 
@@ -557,7 +558,7 @@ const fetchRecentDonations = async () => {
     recentDonations.value.error = null;
 
     const token = localStorage.getItem('admin_token');
-    
+
     const apiUrl = `${API_URL}/admin/donations`;
     console.log('Fetching donations from:', apiUrl);
 
