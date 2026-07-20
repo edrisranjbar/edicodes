@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Tehran',
 
     /*
     |--------------------------------------------------------------------------
@@ -130,7 +130,7 @@ return [
     | Frontend URL
     |--------------------------------------------------------------------------
     |
-    | This URL is used for generating redirects back to the frontend 
+    | This URL is used for generating redirects back to the frontend
     | application after payment processing. It points to the URL where
     | the frontend application is running.
     |
