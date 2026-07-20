@@ -57,19 +57,24 @@
       </div>
 
       <div>
-        <span class="block text-white font-vazir mb-2">انتشار</span>
-        <div class="flex items-center">
-          <input
-            v-model="post.published"
-            type="checkbox"
-            id="published"
-            class="w-5 h-5 bg-black/20 border border-white/10 rounded text-primary focus:ring-primary focus:ring-opacity-25"
-          />
-          <label for="published" class="text-white font-vazir mr-2 cursor-pointer">منتشر شده</label>
+        <label for="status" class="block text-white font-vazir mb-2">وضعیت</label>
+        <div class="relative">
+          <select
+            id="status"
+            v-model="post.status"
+            class="w-full bg-black/20 border border-white/10 rounded-lg py-2 px-4 font-vazir text-white/90 focus:outline-none focus:border-primary/50 appearance-none"
+          >
+            <option value="draft">پیش‌نویس</option>
+            <option value="published">منتشر شده</option>
+            <option value="scheduled">زمان‌بندی شده</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4 text-white/50">
+            <font-awesome-icon icon="chevron-down" class="h-4 w-4" />
+          </div>
         </div>
       </div>
 
-      <div>
+      <div v-if="post.status === 'scheduled' || post.status === 'published'">
         <label for="published_at" class="block text-white font-vazir mb-2">تاریخ انتشار</label>
         <input
           v-model="post.published_at"

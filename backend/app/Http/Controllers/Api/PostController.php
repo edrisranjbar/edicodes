@@ -66,10 +66,10 @@ class PostController extends Controller
             'summary' => 'required|string',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:320',
+            'status' => 'nullable|in:draft,published,scheduled',
             'content' => 'required|string',
             'image' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'published' => 'sometimes|boolean',
             'published_at' => 'nullable|date',
         ]);
 
@@ -79,9 +79,18 @@ class PostController extends Controller
         }
 
         // Set published date if post is published and date not provided
-        if (($validated['published'] ?? true) && !isset($validated['published_at'])) {
+        $status = $validated['status'] ?? ($validated['published'] ?? true ? 'published' : 'draft');
+
+        // Handle scheduled status requirements
+        if ($status === 'scheduled' && empty($validated['published_at'])) {
+            return response()->json(['message' => 'برای زمان‌بندی انتشار باید تاریخ و زمان انتشار مشخص شود.'], 422);
+        }
+
+        if ($status === 'published' && empty($validated['published_at'])) {
             $validated['published_at'] = now();
         }
+
+        $validated['status'] = $status;
 
         $post = Post::create($validated);
 
@@ -96,8 +105,8 @@ class PostController extends Controller
      */
     public function show(Request $request, Post $post)
     {
-        // For public requests, only allow access to published posts
-        if (!$request->user() && !$post->published) {
+        // For public requests, only allow access to published posts (including scheduled ones whose time has arrived)
+        if (!$request->user() && !$post->isPublished()) {
             abort(404);
         }
 
@@ -134,10 +143,10 @@ class PostController extends Controller
             'summary' => 'sometimes|required|string',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:320',
+            'status' => 'nullable|in:draft,published,scheduled',
             'content' => 'sometimes|required|string',
             'image' => 'nullable|string',
             'category_id' => 'sometimes|required|exists:categories,id',
-            'published' => 'sometimes|boolean',
             'published_at' => 'nullable|date',
         ]);
 
@@ -146,10 +155,18 @@ class PostController extends Controller
             $validated['slug'] = Str::slug($validated['title']);
         }
 
-        // Set published date if post is newly published
-        if (isset($validated['published']) && $validated['published'] === true &&
-            !$post->published && !isset($validated['published_at'])) {
+        $status = $validated['status'] ?? ($validated['published'] ?? NULL);
+
+        if ($status === 'scheduled' && empty($validated['published_at'])) {
+            return response()->json(['message' => 'برای زمان‌بندی انتشار باید تاریخ و زمان انتشار مشخص شود.'], 422);
+        }
+
+        if ($status === 'published' && empty($validated['published_at'])) {
             $validated['published_at'] = now();
+        }
+
+        if ($status) {
+            $validated['status'] = $status;
         }
 
         $post->update($validated);

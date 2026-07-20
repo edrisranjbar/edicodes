@@ -19,6 +19,7 @@ class Post extends Model
         'slug',
         'summary',
         'meta_title',
+        'status',
         'meta_description',
         'content',
         'image',
@@ -50,7 +51,27 @@ class Post extends Model
      */
     public function scopePublished($query)
     {
-        return $query->where('published', true);
+        return $query->where(function($q) {
+            $q->where('published', true)
+              ->orWhere(function($q2) {
+                  $q2->where('status', 'published')
+                     ->orWhere(function($q3) {
+                         $q3->where('status', 'scheduled')
+                            ->where('published_at', '<=', now());
+                     });
+              });
+        });
+    }
+
+    /**
+     * Determine if the post is published (including scheduled posts whose time has arrived).
+     */
+    public function isPublished()
+    {
+        if ($this->published) return true;
+        if ($this->status === 'published') return true;
+        if ($this->status === 'scheduled' && $this->published_at && $this->published_at->lte(now())) return true;
+        return false;
     }
 
     /**

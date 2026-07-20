@@ -133,7 +133,7 @@ const post = ref({
   meta_description: '',
   content: '',
   image: '',
-  published: false,
+  status: 'draft',
   published_at: formatDateTime(new Date()),
   category_id: null
 });
@@ -223,6 +223,11 @@ async function fetchPost(id) {
       postData.published_at = formatDateTime(new Date());
     }
 
+    // Backwards compatibility: map old `published` boolean to `status` if `status` not present
+    if (!postData.status) {
+      postData.status = postData.published ? 'published' : 'draft';
+    }
+
     // Set category_id if it exists
     if (postData.category) {
       postData.category_id = postData.category.id;
@@ -263,7 +268,7 @@ async function savePost() {
       meta_description: post.value.meta_description,
       content: post.value.content,
       image: post.value.image,
-      published: post.value.published,
+      status: post.value.status,
       published_at: post.value.published_at,
       category_id: post.value.category_id
     };
