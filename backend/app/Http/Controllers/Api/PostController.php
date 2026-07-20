@@ -18,7 +18,7 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $query = Post::with('category');
-        
+
         // Check if this is an admin request (authenticated) or public request
         if ($request->user()) {
             // Admin request - show all posts unless status is specified
@@ -29,16 +29,16 @@ class PostController extends Controller
             // Public request - always show only published posts
             $query->published();
         }
-        
+
         $query->latest('published_at');
-        
+
         // Filter by category
         if ($request->has('category')) {
             $query->whereHas('category', function ($q) use ($request) {
                 $q->where('slug', $request->category);
             });
         }
-        
+
         // Filter by search term
         if ($request->has('search')) {
             $searchTerm = $request->search;
@@ -48,10 +48,10 @@ class PostController extends Controller
                   ->orWhere('content', 'like', "%{$searchTerm}%");
             });
         }
-        
+
         // Paginate results
         $posts = $query->paginate(10);
-        
+
         return PostResource::collection($posts);
     }
 
@@ -64,6 +64,8 @@ class PostController extends Controller
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:posts',
             'summary' => 'required|string',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:320',
             'content' => 'required|string',
             'image' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
@@ -82,10 +84,10 @@ class PostController extends Controller
         }
 
         $post = Post::create($validated);
-        
+
         // Regenerate sitemap after creating a post
         $this->regenerateSitemap();
-        
+
         return new PostResource($post->load('category'));
     }
 
@@ -98,10 +100,10 @@ class PostController extends Controller
         if (!$request->user() && !$post->published) {
             abort(404);
         }
-        
+
         // Record the page view
         $post->recordView($request);
-        
+
         return new PostResource($post->load('category'));
     }
 
@@ -114,10 +116,10 @@ class PostController extends Controller
             ->published()
             ->with('category')
             ->firstOrFail();
-            
+
         // Record the page view
         $post->recordView($request);
-            
+
         return new PostResource($post);
     }
 
@@ -130,6 +132,8 @@ class PostController extends Controller
             'title' => 'sometimes|required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:posts,slug,' . $post->id,
             'summary' => 'sometimes|required|string',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:320',
             'content' => 'sometimes|required|string',
             'image' => 'nullable|string',
             'category_id' => 'sometimes|required|exists:categories,id',
@@ -143,16 +147,16 @@ class PostController extends Controller
         }
 
         // Set published date if post is newly published
-        if (isset($validated['published']) && $validated['published'] === true && 
+        if (isset($validated['published']) && $validated['published'] === true &&
             !$post->published && !isset($validated['published_at'])) {
             $validated['published_at'] = now();
         }
 
         $post->update($validated);
-        
+
         // Regenerate sitemap after updating a post
         $this->regenerateSitemap();
-        
+
         return new PostResource($post->load('category'));
     }
 
@@ -162,13 +166,13 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $post->delete();
-        
+
         // Regenerate sitemap after deleting a post
         $this->regenerateSitemap();
-        
+
         return response()->json(['message' => 'Post deleted successfully']);
     }
-    
+
     /**
      * Regenerate sitemap in the background
      */
@@ -182,7 +186,7 @@ class PostController extends Controller
             } else {
                 // If sync queue, run it in background using exec
                 $artisanPath = base_path('artisan');
-                $command = PHP_OS_FAMILY === 'Windows' 
+                $command = PHP_OS_FAMILY === 'Windows'
                     ? "start /B php \"{$artisanPath}\" sitemap:generate > NUL 2>&1"
                     : "php \"{$artisanPath}\" sitemap:generate > /dev/null 2>&1 &";
                 exec($command);

@@ -129,6 +129,8 @@ const router = useRouter();
 const post = ref({
   title: '',
   summary: '',
+  meta_title: '',
+  meta_description: '',
   content: '',
   published_at: null,
   category: null,
@@ -143,6 +145,37 @@ const currentUrl = ref('');
 
 const handleImageError = () => {
   imageError.value = true;
+};
+
+const updateSeoMeta = (postData) => {
+  const title = postData?.meta_title || postData?.title || 'ادیکدز';
+  const description = postData?.meta_description || postData?.summary || 'محتوای آموزشی و تخصصی ادیکدز';
+
+  document.title = `${title} | ادیکدز`;
+
+  let descriptionTag = document.querySelector('meta[name="description"]');
+  if (!descriptionTag) {
+    descriptionTag = document.createElement('meta');
+    descriptionTag.setAttribute('name', 'description');
+    document.head.appendChild(descriptionTag);
+  }
+  descriptionTag.setAttribute('content', description);
+
+  let ogTitleTag = document.querySelector('meta[property="og:title"]');
+  if (!ogTitleTag) {
+    ogTitleTag = document.createElement('meta');
+    ogTitleTag.setAttribute('property', 'og:title');
+    document.head.appendChild(ogTitleTag);
+  }
+  ogTitleTag.setAttribute('content', title);
+
+  let ogDescriptionTag = document.querySelector('meta[property="og:description"]');
+  if (!ogDescriptionTag) {
+    ogDescriptionTag = document.createElement('meta');
+    ogDescriptionTag.setAttribute('property', 'og:description');
+    document.head.appendChild(ogDescriptionTag);
+  }
+  ogDescriptionTag.setAttribute('content', description);
 };
 
 const formatDate = (dateString) => {
@@ -172,10 +205,7 @@ const fetchPost = async (slug) => {
       // Record page view
       await recordPageView(post.value.id);
 
-      // Update document title
-      if (post.value.title) {
-        document.title = `${post.value.title} | ادیکدز`;
-      }
+      updateSeoMeta(post.value);
     } else {
       // If the response doesn't have data, redirect to NotFound
       router.replace({ name: 'not-found' });

@@ -2,16 +2,16 @@
   <div>
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
       <div class="flex space-x-2 space-x-reverse">
-        <button 
-          type="button" 
-          @click="router.push('/admin/posts')" 
+        <button
+          type="button"
+          @click="router.push('/admin/posts')"
           class="px-3 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors duration-200 text-sm font-vazir"
         >
           انصراف
         </button>
-        <button 
-          type="button" 
-          @click="savePost" 
+        <button
+          type="button"
+          @click="savePost"
           :disabled="isSaving"
           class="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors duration-200 flex items-center text-sm font-vazir"
         >
@@ -21,27 +21,27 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Alert for errors -->
     <div v-if="error" class="bg-red-500/20 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg mb-6 font-vazir">
       {{ error }}
     </div>
-    
+
     <!-- Blog post form -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Main: title + body only -->
       <div class="lg:col-span-2 space-y-6">
         <div class="bg-black/50 rounded-lg border border-white/10 p-6">
           <label for="title" class="block text-white font-vazir mb-2">عنوان مطلب</label>
-          <input 
-            v-model="post.title" 
-            type="text" 
-            id="title" 
+          <input
+            v-model="post.title"
+            type="text"
+            id="title"
             class="w-full bg-black/20 border border-white/10 rounded-lg py-2 px-4 font-vazir text-white/90 focus:outline-none focus:border-primary/50"
             placeholder="عنوان مطلب را وارد کنید"
           />
         </div>
-        
+
         <div class="bg-black/50 rounded-lg border border-white/10 p-6">
           <label class="block text-white font-vazir mb-2">متن مطلب</label>
           <div class="mb-4 flex flex-wrap items-center justify-end gap-3">
@@ -89,7 +89,7 @@
           />
         </div>
       </div>
-      
+
       <PostFormSidebar
         v-model:post="post"
         :categories="categories"
@@ -129,6 +129,8 @@ const post = ref({
   title: '',
   slug: '',
   summary: '',
+  meta_title: '',
+  meta_description: '',
   content: '',
   image: '',
   published: false,
@@ -160,9 +162,9 @@ function generateSlug() {
     error.value = 'ابتدا عنوان مطلب را وارد کنید.';
     return;
   }
-  
+
   error.value = '';
-  
+
   // Convert to lowercase, replace spaces with hyphens, remove special chars
   const slug = post.value.title
     .toLowerCase()
@@ -170,7 +172,7 @@ function generateSlug() {
     .replace(/[^\u0600-\u06FF\uFB8A\u067E\u0686\u06AF\u200C\u200Fa-z0-9-]/g, '')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
-  
+
   post.value.slug = slug;
 }
 
@@ -178,7 +180,7 @@ function generateSlug() {
 async function fetchCategories() {
   try {
     const response = await axios.get(`${apiUrl}/categories`);
-    
+
     if (response.data && Array.isArray(response.data.data)) {
       categories.value = response.data.data;
     } else if (Array.isArray(response.data)) {
@@ -194,16 +196,16 @@ async function fetchPost(id) {
   blockEditorReady.value = false;
   try {
     console.log('Fetching post with ID:', id);
-    
+
     // Use the admin API endpoint
     const response = await axios.get(`${adminApiUrl.value}/posts/${id}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
       }
     });
-    
+
     console.log('Response data:', response.data);
-    
+
     // Extract the post data from the nested data structure that Laravel API resources return
     let postData;
     if (response.data && response.data.data) {
@@ -213,19 +215,19 @@ async function fetchPost(id) {
       // API returned a direct response
       postData = response.data;
     }
-    
+
     // Format the date for the input
     if (postData.published_at) {
       postData.published_at = formatDateTime(postData.published_at);
     } else {
       postData.published_at = formatDateTime(new Date());
     }
-    
+
     // Set category_id if it exists
     if (postData.category) {
       postData.category_id = postData.category.id;
     }
-    
+
     console.log('Post data after processing:', postData);
     post.value = postData;
     console.log('Final post value:', post.value);
@@ -244,54 +246,56 @@ async function savePost() {
       error.value = 'عنوان مطلب الزامی است.';
       return;
     }
-    
+
     if (!post.value.slug) {
       generateSlug();
     }
-    
+
     isSaving.value = true;
     error.value = '';
-    
+
     // Prepare data for API
     const postData = {
       title: post.value.title,
       slug: post.value.slug,
       summary: post.value.summary,
+      meta_title: post.value.meta_title,
+      meta_description: post.value.meta_description,
       content: post.value.content,
       image: post.value.image,
       published: post.value.published,
       published_at: post.value.published_at,
       category_id: post.value.category_id
     };
-    
+
     // We need to use the admin routes for saving posts since the public routes are read-only
     let response;
     const token = localStorage.getItem('admin_token');
     const headers = {
       'Authorization': `Bearer ${token}`
     };
-    
+
     console.log('Saving post with data:', postData);
     console.log('Using auth token:', token ? 'Token exists' : 'No token');
-    
+
     if (isEditing.value) {
       // Update existing post
       response = await axios.put(
-        `${adminApiUrl.value}/posts/${route.params.id}`, 
+        `${adminApiUrl.value}/posts/${route.params.id}`,
         postData,
         { headers }
       );
     } else {
       // Create new post
       response = await axios.post(
-        `${adminApiUrl.value}/posts`, 
+        `${adminApiUrl.value}/posts`,
         postData,
         { headers }
       );
     }
-    
+
     console.log('Save response:', response.data);
-    
+
     // Redirect to posts list
     router.push('/admin/posts');
   } catch (err) {
@@ -310,7 +314,7 @@ function handleImageUploadError(errorMessage) {
 
 onMounted(async () => {
   await fetchCategories();
-  
+
   if (isEditing.value) {
     await fetchPost(route.params.id);
   }

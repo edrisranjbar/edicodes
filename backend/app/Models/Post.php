@@ -15,12 +15,14 @@ class Post extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'title', 
-        'slug', 
-        'summary', 
-        'content', 
-        'image', 
-        'category_id', 
+        'title',
+        'slug',
+        'summary',
+        'meta_title',
+        'meta_description',
+        'content',
+        'image',
+        'category_id',
         'published',
         'published_at'
     ];
@@ -71,7 +73,7 @@ class Post extends Model
                 $query->where('status', 'approved');
             }]);
     }
-    
+
     /**
      * Get the page views for the post.
      */
@@ -79,7 +81,7 @@ class Post extends Model
     {
         return $this->morphMany(PageView::class, 'viewable', 'page_type', 'page_id');
     }
-    
+
     /**
      * Get total view count for the post.
      */
@@ -87,7 +89,7 @@ class Post extends Model
     {
         return $this->pageViews()->count();
     }
-    
+
     /**
      * Get unique visitors count for the post.
      */
@@ -95,7 +97,7 @@ class Post extends Model
     {
         return $this->pageViews()->uniqueVisitorsCount();
     }
-    
+
     /**
      * Record a view for this post.
      */

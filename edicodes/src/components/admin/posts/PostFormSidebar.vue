@@ -35,6 +35,28 @@
       </div>
 
       <div>
+        <label for="meta_title" class="block text-white font-vazir mb-2">عنوان متا</label>
+        <input
+          v-model="post.meta_title"
+          type="text"
+          id="meta_title"
+          class="w-full bg-black/20 border border-white/10 rounded-lg py-2 px-4 font-vazir text-white/90 focus:outline-none focus:border-primary/50"
+          placeholder="عنوان سئو برای صفحه"
+        />
+      </div>
+
+      <div>
+        <label for="meta_description" class="block text-white font-vazir mb-2">توضیحات متا</label>
+        <textarea
+          v-model="post.meta_description"
+          id="meta_description"
+          rows="4"
+          class="w-full bg-black/20 border border-white/10 rounded-lg py-2 px-4 font-vazir text-white/90 focus:outline-none focus:border-primary/50 resize-none"
+          placeholder="توضیح کوتاه برای موتورهای جستجو"
+        ></textarea>
+      </div>
+
+      <div>
         <span class="block text-white font-vazir mb-2">انتشار</span>
         <div class="flex items-center">
           <input
