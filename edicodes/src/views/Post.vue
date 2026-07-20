@@ -26,7 +26,7 @@
       <article class="max-w-4xl mx-auto">
         <!-- Post Header -->
         <header class="mb-12">
-          <h1 class="text-4xl font-bold mb-6 font-vazir">{{ post.title }}</h1>
+          <h1 class="text-4xl font-bold mb-6 leading-[3.3rem] font-vazir">{{ post.title }}</h1>
           <div class="flex items-center flex-wrap gap-4 text-white/50 font-vazir">
             <router-link
               :to="`/blog?category=${post.category?.slug}`"
