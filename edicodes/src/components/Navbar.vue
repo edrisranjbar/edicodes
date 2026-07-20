@@ -52,6 +52,14 @@
             یوتیوب
           </router-link>
           <router-link 
+            to="/contact" 
+            class="nav-link" 
+            :class="{ 'active': $route.path === '/contact' }"
+          >
+            <font-awesome-icon icon="paper-plane" class="ml-1.5" />
+            تماس با من
+          </router-link>
+          <router-link 
             to="/donation" 
             class="nav-link" 
             :class="{ 'active': $route.path === '/donation' }"
@@ -111,6 +119,10 @@
           >
             <font-awesome-icon :icon="['fab', 'youtube']" class="ml-2" />
             یوتیوب
+          </router-link>
+          <router-link to="/contact" class="mobile-nav-link" @click="isOpen = false">
+            <font-awesome-icon icon="paper-plane" class="ml-2" />
+            تماس با من
           </router-link>
           <router-link to="/donation" class="mobile-nav-link" @click="isOpen = false">
             <font-awesome-icon icon="heart" class="ml-2" />
