@@ -6,6 +6,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Support\Facades\Artisan;
 use App\Console\Commands\PublishScheduledPosts;
+use App\Console\Commands\SendOnlineNotification;
 
 class Kernel extends ConsoleKernel implements KernelContract
 {
@@ -16,6 +17,7 @@ class Kernel extends ConsoleKernel implements KernelContract
      */
     protected $commands = [
         PublishScheduledPosts::class,
+        SendOnlineNotification::class,
     ];
 
     /**
