@@ -3,14 +3,58 @@
 namespace Tests\Feature\Api;
 
 use App\Models\Donation;
+use App\Models\Admin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class DonationTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;
+
+    public function test_donations_are_public_by_default(): void
+    {
+        $donation = Donation::factory()->paid()->create();
+
+        $this->assertTrue($donation->is_public);
+    }
+
+    public function test_private_donations_are_not_returned_by_public_endpoint(): void
+    {
+        $publicDonation = Donation::factory()->paid()->create(['is_public' => true]);
+        $privateDonation = Donation::factory()->paid()->create(['is_public' => false]);
+
+        $response = $this->getJson('/api/donations');
+
+        $response->assertOk()
+            ->assertJsonFragment(['id' => $publicDonation->id])
+            ->assertJsonMissing(['id' => $privateDonation->id]);
+    }
+
+    public function test_admin_can_make_a_donation_private(): void
+    {
+        $admin = Admin::query()->create([
+            'name' => 'Test Admin',
+            'email' => 'admin@example.com',
+            'password' => 'password',
+            'is_active' => true,
+        ]);
+        Sanctum::actingAs($admin);
+
+        $donation = Donation::factory()->paid()->create();
+
+        $this->putJson("/api/admin/donations/{$donation->id}", [
+            'is_public' => false,
+        ])->assertOk()
+            ->assertJsonPath('data.is_public', false);
+
+        $this->assertDatabaseHas('donations', [
+            'id' => $donation->id,
+            'is_public' => false,
+        ]);
+    }
     
     /**
      * Test donation validation

@@ -282,14 +282,14 @@ const formatDate = (dateString) => {
 
 // Return a Persian label for the post status, supporting scheduled posts
 const statusLabel = (post) => {
-  if (post.published) return 'منتشر شده';
+  if (post.status === 'published' || post.published) return 'منتشر شده';
   if (post.status === 'scheduled') return 'زمان‌بندی شده';
   return 'پیش‌نویس';
 };
 
 // Return Tailwind classes for the status badge
 const statusClass = (post) => {
-  if (post.published) return 'bg-green-500/10 text-green-500';
+  if (post.status === 'published' || post.published) return 'bg-green-500/10 text-green-500';
   if (post.status === 'scheduled') return 'bg-blue-500/10 text-blue-500';
   return 'bg-yellow-500/10 text-yellow-500';
 };

@@ -26,8 +26,13 @@ class Donation extends Model
         'tracking_code',
         'ref_id',
         'status',
+        'is_public',
         'ip_address',
         'user_agent',
+    ];
+
+    protected $casts = [
+        'is_public' => 'boolean',
     ];
     
     /**
@@ -66,6 +71,14 @@ class Donation extends Model
     public function scopePaid($query)
     {
         return $query->where('status', 'paid');
+    }
+
+    /**
+     * Scope a query to donations that may be shown publicly.
+     */
+    public function scopePublic($query)
+    {
+        return $query->where('is_public', true);
     }
     
     /**

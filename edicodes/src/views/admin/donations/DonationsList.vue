@@ -29,6 +29,7 @@
               <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">ایمیل</th>
               <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">مبلغ</th>
               <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">وضعیت</th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">نمایش عمومی</th>
               <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">کد پیگیری</th>
               <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">تاریخ</th>
             </tr>
@@ -37,7 +38,7 @@
           <tbody class="divide-y divide-black/50 bg-black/20">
             <!-- Loading state -->
             <tr v-if="loading">
-              <td colspan="6" class="px-6 py-8">
+              <td colspan="7" class="px-6 py-8">
                 <div class="flex justify-center">
                   <div class="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
                 </div>
@@ -46,7 +47,7 @@
 
             <!-- No results -->
             <tr v-else-if="donations.length === 0">
-              <td colspan="6" class="px-6 py-8 text-center text-white/50 font-vazir">
+              <td colspan="7" class="px-6 py-8 text-center text-white/50 font-vazir">
                 حمایت مالی یافت نشد.
               </td>
             </tr>
@@ -70,6 +71,29 @@
                   'bg-red-500/10 text-red-500': donation && donation.status === 'failed'
                 }">
                   {{ donation && donation.status_in_persian ? donation.status_in_persian : '-' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <button
+                  type="button"
+                  :disabled="visibilityUpdatingId === donation.id"
+                  :aria-pressed="donation.is_public"
+                  @click="toggleVisibility(donation)"
+                  :class="[
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:cursor-wait disabled:opacity-60',
+                    donation.is_public ? 'bg-green-500' : 'bg-white/20'
+                  ]"
+                  :title="donation.is_public ? 'خصوصی کردن حمایت' : 'عمومی کردن حمایت'"
+                >
+                  <span
+                    :class="[
+                      'inline-block h-4 w-4 rounded-full bg-white transition-transform',
+                      donation.is_public ? '-translate-x-6' : '-translate-x-1'
+                    ]"
+                  ></span>
+                </button>
+                <span class="mr-2 text-xs font-vazir" :class="donation.is_public ? 'text-green-400' : 'text-white/50'">
+                  {{ donation.is_public ? 'عمومی' : 'خصوصی' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white/80">
@@ -154,6 +178,7 @@ import { API_URL } from '@/config';
 
 // State
 const loading = ref(true);
+const visibilityUpdatingId = ref(null);
 const donations = ref([]);
 const pagination = reactive({
   current_page: 1,
@@ -230,6 +255,29 @@ const changePage = (page) => {
 const resetPageAndFetch = () => {
   pagination.current_page = 1;
   fetchDonations();
+};
+
+const toggleVisibility = async (donation) => {
+  if (!donation || visibilityUpdatingId.value !== null) return;
+
+  try {
+    visibilityUpdatingId.value = donation.id;
+    const token = localStorage.getItem('admin_token');
+    const nextVisibility = !donation.is_public;
+
+    await axios.put(
+      `${API_URL}/admin/donations/${donation.id}`,
+      { is_public: nextVisibility },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    donation.is_public = nextVisibility;
+  } catch (error) {
+    console.error('Error updating donation visibility:', error);
+    window.alert('تغییر وضعیت نمایش حمایت انجام نشد. لطفاً دوباره تلاش کنید.');
+  } finally {
+    visibilityUpdatingId.value = null;
+  }
 };
 
 const formatDate = (dateString) => {

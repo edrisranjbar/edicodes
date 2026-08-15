@@ -109,6 +109,7 @@ class DonationFactory extends Factory
             'tracking_code' => $isPaid ? $this->faker->regexify('[0-9]{10}') : null,
             'ref_id' => $isPaid ? $this->faker->regexify('[0-9]{10}') : null,
             'status' => $status,
+            'is_public' => true,
             'ip_address' => $this->faker->ipv4(),
             'user_agent' => $this->faker->userAgent(),
             'created_at' => $this->faker->dateTimeBetween('-6 months', 'now'),
@@ -169,4 +170,3 @@ class DonationFactory extends Factory
         ]);
     }
 }
-

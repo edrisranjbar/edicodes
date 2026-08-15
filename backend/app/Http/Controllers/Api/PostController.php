@@ -78,8 +78,8 @@ class PostController extends Controller
             $validated['slug'] = Str::slug($validated['title']);
         }
 
-        // Set published date if post is published and date not provided
-        $status = $validated['status'] ?? ($validated['published'] ?? true ? 'published' : 'draft');
+        // Keep the new status field and old published boolean in sync.
+        $status = $validated['status'] ?? 'published';
 
         // Handle scheduled status requirements
         if ($status === 'scheduled' && empty($validated['published_at'])) {
@@ -91,6 +91,7 @@ class PostController extends Controller
         }
 
         $validated['status'] = $status;
+        $validated['published'] = $status === 'published';
 
         $post = Post::create($validated);
 
@@ -155,7 +156,7 @@ class PostController extends Controller
             $validated['slug'] = Str::slug($validated['title']);
         }
 
-        $status = $validated['status'] ?? ($validated['published'] ?? NULL);
+        $status = $validated['status'] ?? null;
 
         if ($status === 'scheduled' && empty($validated['published_at'])) {
             return response()->json(['message' => 'برای زمان‌بندی انتشار باید تاریخ و زمان انتشار مشخص شود.'], 422);
@@ -167,6 +168,7 @@ class PostController extends Controller
 
         if ($status) {
             $validated['status'] = $status;
+            $validated['published'] = $status === 'published';
         }
 
         $post->update($validated);

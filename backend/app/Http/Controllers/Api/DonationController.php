@@ -26,6 +26,7 @@ class DonationController extends Controller
         $perPage = $request->input('per_page', 10);
         
         $donations = Donation::where('status', 'paid')
+            ->public()
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
         
@@ -386,6 +387,7 @@ class DonationController extends Controller
                 'payment_method' => $donation->payment_method,
                 'status' => $donation->status,
                 'status_in_persian' => $donation->status_in_persian,
+                'is_public' => $donation->is_public,
                 'transaction_id' => $donation->transaction_id,
                 'ref_id' => $donation->ref_id,
                 'ip_address' => $donation->ip_address,
@@ -403,11 +405,12 @@ class DonationController extends Controller
     {
         $request->validate([
             'status' => 'sometimes|in:pending,paid,failed',
+            'is_public' => 'sometimes|boolean',
             'notes' => 'sometimes|string|max:1000'
         ]);
 
         try {
-            $updateData = $request->only(['status']);
+            $updateData = $request->only(['status', 'is_public']);
 
             $donation->update($updateData);
 
@@ -424,7 +427,7 @@ class DonationController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'کمک مالی با موفقیت به‌روزرسانی شد',
-                'data' => $donation->load('formatted_amount', 'status_in_persian')
+                'data' => $donation->refresh()->append(['formatted_amount', 'status_in_persian'])
             ]);
 
         } catch (\Exception $e) {

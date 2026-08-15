@@ -269,6 +269,7 @@ async function savePost() {
       content: post.value.content,
       image: post.value.image,
       status: post.value.status,
+      published: post.value.status === 'published',
       published_at: post.value.published_at,
       category_id: post.value.category_id
     };
