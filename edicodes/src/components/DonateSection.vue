@@ -1,227 +1,190 @@
 <template>
-  <section id="donate" class="py-16 px-4 md:px-8 bg-black/40">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="max-w-3xl mx-auto">
-        <div class="text-center mb-8">
-          <h2 class="text-4xl font-bold mb-4 font-vazir">
-            <span class="text-primary">حمایت</span> مالی (دونیت)
-          </h2>
-          <p class="text-white/70 mb-8">
-            با حمایت مالی از من، به توسعه پروژه‌های متن‌باز و تولید محتوای آموزشی کمک کنید.
+  <section id="donate" class="donation-section" dir="rtl" aria-labelledby="donation-title">
+    <div class="donation-shell">
+      <div class="donation-layout">
+        <header class="donation-intro">
+          <div class="heart-art" aria-hidden="true">
+            <div class="heart-orbit orbit-one" />
+            <div class="heart-orbit orbit-two" />
+            <div class="heart-tile"><font-awesome-icon icon="heart" /></div>
+            <span class="art-spark spark-one">+</span><span class="art-spark spark-two">+</span>
+          </div>
+          <h2 id="donation-title">حمایت شما<br /><span>انگیزه‌ای برای ساختن.</span></h2>
+          <p class="intro-copy">
+            اگر آموزش‌ها و پروژه‌هایم برایتان مفید بوده، با حمایت شما زمان بیشتری برای ساختن و
+            به‌اشتراک‌گذاشتن دانش خواهم داشت.
           </p>
-        </div>
-
-        <!-- Success message -->
-        <div v-if="showSuccess" class="bg-primary/10 border border-primary/30 text-primary p-4 rounded-lg mb-6">
-          <p class="flex items-center justify-center gap-2">
-            <font-awesome-icon icon="check-circle" />
-            {{ successMessage }}
-          </p>
-        </div>
-
-        <!-- Error message -->
-        <div v-if="error" class="bg-red-500/10 border border-red-500/30 text-red-500 p-4 rounded-lg mb-6">
-          <p class="flex items-center justify-center gap-2">
-            <font-awesome-icon icon="exclamation-circle" />
-            {{ error }}
-          </p>
-        </div>
-
-        <div class="bg-black/40 rounded-2xl p-8 border border-white/5">
-          <!-- Form inputs -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="impact-list">
             <div>
-              <input
-                type="text"
-                v-model="name"
-                placeholder="نام (اختیاری)"
-                class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-primary transition-colors"
-              />
+              <span class="impact-icon"><font-awesome-icon icon="code" /></span>
+              <div>
+                <h3>پروژه‌های متن‌باز</h3>
+                <p>ابزارهایی برای استفاده و یادگیری همه</p>
+              </div>
             </div>
             <div>
-              <input
-                type="email"
-                v-model="email"
-                placeholder="ایمیل (اختیاری)"
-                class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-primary transition-colors"
-                dir="ltr"
-              />
-            </div>
-          </div>
-          
-          <div class="mb-6">
-            <textarea
-              v-model="message"
-              placeholder="پیام شما (اختیاری)"
-              rows="2"
-              class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-primary transition-colors"
-            ></textarea>
-          </div>
-
-          <!-- Amount Selection -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <button
-              @click="selectAmount(50000)"
-              :class="[
-                'p-4 rounded-lg border transition-all duration-200 text-lg font-medium',
-                amount === 50000
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'border-white/5 text-white/70 hover:border-primary/50'
-              ]"
-            >
-              ۵۰,۰۰۰ تومان
-            </button>
-            <button
-              @click="selectAmount(250000)"
-              :class="[
-                'p-4 rounded-lg border transition-all duration-200 text-lg font-medium relative',
-                amount === 250000
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'border-white/5 text-white/70 hover:border-primary/50'
-              ]"
-            >
-              ۲۵۰,۰۰۰ تومان
-              <span class="absolute -top-2 right-2 text-xs bg-primary text-white px-2 py-0.5 rounded-full">پیشنهادی</span>
-            </button>
-            <button
-              @click="selectAmount(1000000)"
-              :class="[
-                'p-4 rounded-lg border transition-all duration-200 text-lg font-medium',
-                amount === 1000000
-                  ? 'bg-primary/10 border-primary text-primary'
-                  : 'border-white/5 text-white/70 hover:border-primary/50'
-              ]"
-            >
-              ۱,۰۰۰,۰۰۰ تومان
-            </button>
-          </div>
-
-          <!-- Amount Input -->
-          <div class="mb-8">
-            <div class="relative">
-              <input
-                type="number"
-                v-model="amount"
-                placeholder="مبلغ دلخواه (تومان)"
-                class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-primary transition-colors text-center"
-                min="10000"
-                step="10000"
-                @input="validateAmount"
-              />
-            </div>
-            <p v-if="amountError" class="text-red-500 text-sm mt-1">{{ amountError }}</p>
-          </div>
-
-          <!-- Payment Button -->
-          <button
-            @click="handleDonate"
-            class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-4 px-8 rounded-lg transition-colors duration-200 flex items-center justify-center gap-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="!isValidAmount || isLoading"
-          >
-            <font-awesome-icon v-if="isLoading" icon="circle-notch" class="animate-spin" />
-            <font-awesome-icon v-else icon="credit-card" />
-            {{ isLoading ? 'در حال اتصال به درگاه...' : 'حمایت کنید' }}
-          </button>
-        </div>
-
-        <!-- Donors List -->
-        <div class="mt-20">
-          <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center gap-3 mb-3">
-              <div class="w-1 h-8 bg-gradient-to-b from-transparent via-primary to-transparent rounded-full"></div>
-              <h3 class="text-3xl font-bold text-white font-vazir flex items-center gap-3">
-                <font-awesome-icon icon="heart" class="text-primary animate-pulse" />
-                حامیان ما
-              </h3>
-              <div class="w-1 h-8 bg-gradient-to-b from-transparent via-primary to-transparent rounded-full"></div>
-            </div>
-            <p class="text-white/60 text-base max-w-2xl mx-auto leading-relaxed">
-              از تمامی حامیان عزیز که در توسعه پروژه‌های متن‌باز و تولید محتوای آموزشی همراه ما هستند، صمیمانه سپاسگزاریم
-            </p>
-          </div>
-
-          <!-- Loading State -->
-          <div v-if="donorsLoading" class="flex justify-center py-12">
-            <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-          </div>
-
-          <!-- Error State -->
-          <div v-else-if="donorsError" class="text-center py-12">
-            <font-awesome-icon icon="exclamation-triangle" class="text-red-500/50 text-3xl mb-3" />
-            <p class="text-red-500/70 text-sm">خطا در بارگذاری لیست حامیان</p>
-          </div>
-
-          <!-- Empty State -->
-          <div v-else-if="donors.length === 0" class="text-center py-12">
-            <font-awesome-icon icon="heart" class="text-white/20 text-4xl mb-3" />
-            <p class="text-white/50 text-sm">هنوز حامیانی ثبت نشده است</p>
-          </div>
-
-          <!-- Donors Grid -->
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div
-              v-for="donor in donors"
-              :key="donor.id"
-              class="relative bg-gradient-to-br from-black/40 via-black/30 to-black/40 border border-white/10 rounded-2xl p-6 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group overflow-hidden"
-            >
-              <!-- Decorative gradient overlay -->
-              <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-transparent to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-              
-              <!-- Content -->
-              <div class="relative z-10">
-                <!-- Donor Header -->
-                <div class="flex items-start justify-between mb-4">
-                  <div class="flex items-center gap-3 flex-1">
-                    <div class="relative">
-                      <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary/30 to-purple-600/30 flex items-center justify-center border border-primary/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                        <font-awesome-icon icon="user" class="text-primary text-base" />
-                      </div>
-                      <!-- Decorative ring -->
-                      <div class="absolute inset-0 rounded-full border-2 border-primary/20 scale-125 opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500"></div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <h4 class="text-white font-vazir font-semibold text-base truncate">{{ donor.name }}</h4>
-                      <div class="flex items-center gap-2 mt-1">
-                        <font-awesome-icon icon="clock" class="text-white/30 text-xs" />
-                        <p class="text-white/50 text-xs">{{ donor.created_at_human }}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="text-left mr-2">
-                    <span class="text-primary text-base font-vazir">{{ donor.formatted_amount }}</span>
-                  </div>
-                </div>
-
-                <!-- Donor Message -->
-                <div v-if="donor.message" class="mt-4 pt-4 border-t border-white/10">
-                  <div class="flex items-start gap-2">
-                    <font-awesome-icon icon="quote-right" class="text-primary/40 text-xs mt-1 flex-shrink-0" />
-                    <p class="text-white/70 text-sm leading-relaxed font-vazir" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                      {{ donor.message }}
-                    </p>
-                  </div>
-                </div>
+              <span class="impact-icon"><font-awesome-icon icon="book" /></span>
+              <div>
+                <h3>آموزش و تجربه‌های واقعی</h3>
+                <p>محتوای کاربردی از مسیر توسعه نرم‌افزار</p>
               </div>
             </div>
           </div>
+          <p class="personal-note">ممنونم که بخشی از این مسیر هستید.</p>
+        </header>
 
-          <!-- Load More Button -->
-          <div v-if="hasMoreDonors" class="text-center mt-10">
-            <button
-              @click="loadMoreDonors"
-              :disabled="loadingMore"
-              class="group relative bg-gradient-to-r from-black/50 to-black/40 hover:from-primary/20 hover:to-purple-600/20 border border-white/10 hover:border-primary/40 text-white px-8 py-3.5 rounded-xl transition-all duration-300 font-vazir disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
-            >
-              <!-- Shine effect on hover -->
-              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-              
-              <span class="relative flex items-center justify-center gap-2">
-                <font-awesome-icon v-if="loadingMore" icon="circle-notch" class="animate-spin" />
-                <font-awesome-icon v-else icon="chevron-down" class="text-primary group-hover:translate-y-1 transition-transform duration-300" />
-                <span>{{ loadingMore ? 'در حال بارگذاری...' : 'نمایش حامیان بیشتر' }}</span>
-              </span>
-            </button>
+        <form class="donation-form" @submit.prevent="handleDonate" :aria-busy="isLoading">
+          <div class="form-heading">
+            <div>
+              <span class="eyebrow">حمایت مالی</span>
+              <h3>سهم شما در ادامه‌ی مسیر</h3>
+            </div>
+            <span class="form-heart" aria-hidden="true"><font-awesome-icon icon="heart" /></span>
           </div>
+          <fieldset :disabled="isLoading">
+            <legend>مبلغ حمایت را انتخاب کنید</legend>
+            <div class="amount-options">
+              <button
+                v-for="preset in presets"
+                :key="preset"
+                type="button"
+                class="amount-option"
+                :class="{ selected: Number(amount) === preset }"
+                :aria-pressed="Number(amount) === preset"
+                @click="selectAmount(preset)"
+              >
+                <span class="option-indicator" aria-hidden="true"
+                  ><font-awesome-icon v-if="Number(amount) === preset" icon="check"
+                /></span>
+                <strong>{{ formatAmount(preset) }}</strong
+                ><span class="currency">تومان</span>
+              </button>
+            </div>
+            <label class="field-label" for="donation-amount">یا مبلغ دلخواه شما</label>
+            <div class="amount-input-wrap">
+              <input
+                id="donation-amount"
+                v-model="amount"
+                type="number"
+                inputmode="numeric"
+                min="1000"
+                step="any"
+                required
+                aria-describedby="amount-help amount-error"
+                :aria-invalid="!!amountError"
+                @input="validateAmount"
+              /><span>تومان</span>
+            </div>
+            <p id="amount-help" class="field-help">هر مبلغی ارزشمند است؛ حداقل ۱٬۰۰۰ تومان.</p>
+            <p id="amount-error" class="field-error" aria-live="polite">{{ amountError }}</p>
+            <div class="details-heading"><span>چند کلمه از شما</span><span>اختیاری</span></div>
+            <div class="identity-fields">
+              <div>
+                <label class="field-label" for="donation-name">نام شما</label
+                ><input
+                  id="donation-name"
+                  v-model="name"
+                  type="text"
+                  autocomplete="name"
+                  placeholder="نام یا نام مستعار"
+                />
+              </div>
+              <div>
+                <label class="field-label" for="donation-email">ایمیل</label
+                ><input
+                  id="donation-email"
+                  v-model="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="you@example.com"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+            <label class="field-label message-label" for="donation-message">پیام شما</label>
+            <textarea
+              id="donation-message"
+              v-model="message"
+              rows="2"
+              placeholder="خواندن پیامتان خوشحالم می‌کند…"
+            />
+          </fieldset>
+          <Transition name="notice"
+            ><div v-if="error" class="payment-error" role="alert">
+              <font-awesome-icon icon="exclamation-circle" /> {{ error }}
+            </div></Transition
+          >
+          <div v-if="showSuccess" class="payment-success" role="status">{{ successMessage }}</div>
+          <button class="payment-button" type="submit" :disabled="!isValidAmount || isLoading">
+            <font-awesome-icon
+              :icon="isLoading ? 'circle-notch' : 'heart'"
+              :class="{ spinner: isLoading }"
+            />
+            <span>{{
+              isLoading
+                ? 'در حال اتصال به درگاه…'
+                : 'حمایت با ' + formatAmount(Number(amount) || 0) + ' تومان'
+            }}</span>
+            <font-awesome-icon v-if="!isLoading" icon="arrow-left" class="payment-arrow" />
+          </button>
+          <p class="payment-note">
+            <font-awesome-icon icon="lock" /> برای پرداخت به درگاه منتقل می‌شوید
+          </p>
+        </form>
+      </div>
+
+      <div class="supporters-section">
+        <header class="supporters-heading">
+          <div>
+            <span class="eyebrow">همراهان این مسیر</span>
+            <h3>با حمایت شما ساخته می‌شود<span aria-hidden="true"> ♥</span></h3>
+          </div>
+          <p>قدردان تک‌تک شما هستم.</p>
+        </header>
+        <div v-if="donorsLoading" class="supporters-state" role="status">
+          <font-awesome-icon icon="circle-notch" class="spinner" />
+          <p>در حال دریافت حامیان…</p>
+        </div>
+        <div v-else-if="donorsError && !donors.length" class="supporters-state" role="status">
+          <p>دریافت فهرست حامیان ممکن نشد.</p>
+          <button type="button" class="secondary-button" @click="fetchDonors()">تلاش دوباره</button>
+        </div>
+        <div v-else-if="!donors.length" class="supporters-state">
+          <font-awesome-icon icon="heart" />
+          <p>جای اولین همراه اینجا خالی‌ست.</p>
+          <span>حمایت شما می‌تواند شروع این مسیر باشد.</span>
+        </div>
+        <div v-else class="supporters-grid">
+          <article v-for="donor in donors" :key="donor.id" class="supporter-card">
+            <div class="supporter-top">
+              <span class="supporter-avatar" aria-hidden="true">{{
+                Array.from(donor.name || 'حامی')[0]
+              }}</span>
+              <div class="supporter-person">
+                <h4>{{ donor.name || 'حامی ناشناس' }}</h4>
+                <p>{{ donor.created_at_human }}</p>
+              </div>
+              <span class="supporter-amount">{{ donor.formatted_amount }}</span>
+            </div>
+            <p v-if="donor.message" class="supporter-message">{{ donor.message }}</p>
+          </article>
+        </div>
+        <p v-if="donorsError && donors.length" class="field-error" role="alert">
+          دریافت حامیان بیشتر ممکن نشد. دوباره تلاش کنید.
+        </p>
+        <div v-if="hasMoreDonors && donors.length" class="load-more">
+          <button
+            type="button"
+            class="secondary-button"
+            :disabled="loadingMore"
+            @click="loadMoreDonors"
+          >
+            <font-awesome-icon
+              :icon="loadingMore ? 'circle-notch' : 'chevron-down'"
+              :class="{ spinner: loadingMore }"
+            />
+            {{ loadingMore ? 'در حال بارگذاری…' : 'نمایش حامیان بیشتر' }}
+          </button>
         </div>
       </div>
     </div>
@@ -238,6 +201,8 @@ const message = ref('')
 const isLoading = ref(false)
 const error = ref('')
 const amountError = ref('')
+const presets = [50000, 250000, 1000000]
+const formatAmount = (value) => new Intl.NumberFormat('fa-IR').format(value)
 const showSuccess = ref(false)
 const successMessage = ref('')
 
@@ -250,7 +215,7 @@ const hasMoreDonors = ref(false)
 const loadingMore = ref(false)
 
 const isValidAmount = computed(() => {
-  return Number(amount.value) >= 1000 && !amountError.value
+  return Number.isFinite(Number(amount.value)) && Number(amount.value) >= 1000 && !amountError.value
 })
 
 const selectAmount = (value) => {
@@ -260,28 +225,28 @@ const selectAmount = (value) => {
 
 const validateAmount = () => {
   amountError.value = ''
-  
+
   if (!amount.value) {
     amountError.value = 'لطفاً مبلغ را وارد کنید'
     return
   }
-  
+
   if (Number(amount.value) < 1000) {
     amountError.value = 'حداقل مبلغ ۱۰۰۰ تومان است'
-    amount.value = 1000
+
     return
   }
 }
 
 const handleDonate = async () => {
   if (!isValidAmount.value || isLoading.value) return
-  
+
   error.value = ''
   showSuccess.value = false
   isLoading.value = true
-  
+
   try {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.edrisranjbar.ir';
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.edrisranjbar.ir'
     const response = await fetch(`${apiBaseUrl}/donations/pay`, {
       method: 'POST',
       headers: {
@@ -290,33 +255,33 @@ const handleDonate = async () => {
       body: JSON.stringify({
         amount: amount.value,
         name: name.value,
-        email: email.value, 
-        message: message.value
-      })
-    });
-    
-    const data = await response.json();
-    
+        email: email.value,
+        message: message.value,
+      }),
+    })
+
+    const data = await response.json()
+
     if (response.ok && data.success) {
       // Store donation ID in localStorage for future reference if needed
       if (data.donation_id) {
-        localStorage.setItem('current_donation_id', data.donation_id);
+        localStorage.setItem('current_donation_id', data.donation_id)
       }
-      
+
       // Redirect to payment gateway
-      window.location.href = data.payment_url;
+      window.location.href = data.payment_url
     } else {
-      error.value = data.message || 'خطا در اتصال به درگاه پرداخت. لطفاً مجدد تلاش کنید.';
-      
+      error.value = data.message || 'خطا در اتصال به درگاه پرداخت. لطفاً مجدد تلاش کنید.'
+
       if (data.errors && data.errors.amount) {
-        amountError.value = data.errors.amount[0];
+        amountError.value = data.errors.amount[0]
       }
     }
   } catch (err) {
-    error.value = 'خطا در اتصال به سرور. لطفاً مجدد تلاش کنید.';
-    console.error('Donation error:', err);
+    error.value = 'خطا در اتصال به سرور. لطفاً مجدد تلاش کنید.'
+    console.error('Donation error:', err)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
@@ -329,23 +294,23 @@ const fetchDonors = async (page = 1) => {
       loadingMore.value = true
     }
     donorsError.value = false
-    
+
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.edrisranjbar.ir'
     const response = await fetch(`${apiBaseUrl}/donations?per_page=8&page=${page}`)
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch donors')
     }
-    
+
     const result = await response.json()
-    
+
     if (result.success && result.data) {
       if (page === 1) {
         donors.value = result.data.data
       } else {
         donors.value = [...donors.value, ...result.data.data]
       }
-      
+
       currentPage.value = result.data.current_page
       hasMoreDonors.value = result.data.current_page < result.data.last_page
     }
@@ -370,11 +335,730 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.donate-card {
-  @apply bg-white/5 rounded-lg border border-white/10 hover:border-primary/30 transition-all duration-200;
+.donation-section {
+  --surface: #171c2a;
+  --ink: #f5f6fc;
+  --muted: #b4bdcf;
+  --accent: #b7c4ff;
+  --line: #63708a;
+  background: radial-gradient(ellipse at 90% 15%, #232b493d, transparent 45%), #10141f;
+  color: var(--ink);
+  padding: 88px 24px 72px;
+  scroll-margin-top: 72px;
+  overflow: hidden;
 }
-
-.btn-primary {
-  @apply inline-block px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors duration-200 font-medium;
+.donation-shell {
+  max-width: 1120px;
+  margin: auto;
 }
-</style> 
+.donation-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap: 88px;
+  align-items: center;
+}
+.donation-intro {
+  animation: reveal 650ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 5px #b7c4ff0c;
+}
+.donation-intro h2 {
+  font-size: clamp(30px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.8;
+  letter-spacing: -1.3px;
+  margin: 12px 0 16px;
+}
+.donation-intro h2 span {
+  color: var(--accent);
+}
+.intro-copy {
+  font-size: 15px;
+  line-height: 2.2;
+  color: var(--muted);
+  max-width: 420px;
+}
+.heart-art {
+  position: relative;
+  width: 168px;
+  height: 148px;
+  display: grid;
+  place-items: center;
+  margin: 28px 0 12px;
+}
+.heart-tile {
+  width: 78px;
+  height: 78px;
+  border: 1px solid #859be880;
+  border-radius: 25px;
+  background: linear-gradient(145deg, #354166, #20283e);
+  box-shadow:
+    0 16px 50px #05081370,
+    inset 0 1px 0 #c2cdff24;
+  display: grid;
+  place-items: center;
+  color: #c4ceff;
+  font-size: 31px;
+  transform: rotate(-9deg);
+  animation: heart-arrive 850ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+.heart-orbit {
+  position: absolute;
+  width: 138px;
+  height: 138px;
+  border: 1px solid #aabaff18;
+  border-radius: 50%;
+}
+.orbit-two {
+  width: 104px;
+  height: 104px;
+  border-style: dashed;
+  animation: orbit-reveal 1400ms ease-out both;
+}
+.art-spark {
+  position: absolute;
+  color: #9faedf;
+  font-size: 20px;
+}
+.spark-one {
+  top: 13px;
+  right: 15px;
+}
+.spark-two {
+  left: 13px;
+  bottom: 22px;
+  font-size: 13px;
+}
+.impact-list {
+  display: grid;
+  gap: 22px;
+  margin: 30px 0;
+}
+.impact-list > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.impact-icon {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #34405b;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: #1b2233;
+}
+.impact-list h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.impact-list p {
+  font-size: 12px;
+  color: var(--muted);
+}
+.personal-note {
+  border-top: 1px solid #30384a;
+  padding-top: 22px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 2;
+}
+.personal-note span {
+  display: block;
+  color: var(--ink);
+  margin-top: 5px;
+}
+.donation-form {
+  background: var(--surface);
+  border: 1px solid #394257;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 24px 64px #00000026;
+  animation: reveal 650ms 100ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+.form-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+.form-heading h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 9px;
+}
+.form-heart {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #b7c4ff10;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+legend {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.amount-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.amount-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: #121724;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 25px 6px 14px;
+  transition:
+    background 180ms,
+    border-color 180ms,
+    transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.amount-option strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+.currency {
+  font-size: 11px;
+  color: var(--muted);
+}
+.amount-option.selected {
+  background: #293452;
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: #e0e6ff;
+}
+.option-indicator {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 13px;
+  height: 13px;
+  border: 1px solid #77849e;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 8px;
+}
+.selected .option-indicator {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #15203e;
+}
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 9px;
+  color: #d4daea;
+}
+input,
+textarea {
+  width: 100%;
+  min-width: 0;
+  background: #111622;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  padding: 12px 13px;
+  font: inherit;
+  font-size: 13px;
+  transition:
+    border-color 180ms,
+    box-shadow 180ms;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #98a4bb;
+  opacity: 1;
+}
+textarea {
+  resize: vertical;
+  min-height: 82px;
+  display: block;
+  line-height: 1.8;
+}
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px #b7c4ff1a;
+  outline: none;
+}
+.amount-input-wrap {
+  position: relative;
+}
+.amount-input-wrap input {
+  direction: ltr;
+  text-align: right;
+  padding-inline: 70px 14px;
+  font-size: 17px;
+  font-weight: 600;
+  appearance: textfield;
+}
+.amount-input-wrap input::-webkit-inner-spin-button {
+  appearance: none;
+}
+.amount-input-wrap > span {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+  color: var(--muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+.field-help {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 9px;
+}
+.field-error {
+  color: #ffc0c7;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.field-error:not(:empty) {
+  margin-top: 8px;
+}
+.details-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #353e51;
+  padding-top: 23px;
+  margin: 24px 0 18px;
+  font-size: 13px;
+}
+.details-heading span:last-child {
+  color: var(--muted);
+  font-size: 11px;
+}
+.identity-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.message-label {
+  margin-top: 17px;
+}
+.payment-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  width: 100%;
+  background: #b7c4ff;
+  color: #141d38;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 16px 12px;
+  margin-top: 24px;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 5px 18px #070c1a33;
+  transition:
+    background 180ms,
+    transform 180ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 180ms;
+}
+.payment-arrow {
+  margin-right: auto;
+  transition: transform 180ms;
+}
+.payment-button > svg:first-child {
+  margin-left: auto;
+}
+.payment-button:disabled {
+  background: #343d52;
+  color: #bbc4d8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.payment-note {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 14px;
+}
+.payment-error,
+.payment-success {
+  padding: 12px;
+  border: 1px solid #81505e;
+  background: #34212b;
+  border-radius: 10px;
+  color: #ffd3d9;
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 18px;
+}
+.payment-success {
+  background: #1c342d;
+  border-color: #4e806e;
+  color: #c5f2df;
+}
+.supporters-section {
+  margin-top: 80px;
+  border-top: 1px solid #30384a;
+  padding-top: 34px;
+}
+.supporters-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+.supporters-heading h3 {
+  font-size: 23px;
+  font-weight: 700;
+  margin-top: 9px;
+}
+.supporters-heading h3 span {
+  color: var(--accent);
+  font-size: 18px;
+}
+.supporters-heading > p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.supporters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.supporter-card {
+  background: #171c28;
+  border: 1px solid #364056;
+  border-radius: 15px;
+  padding: 21px;
+  transition:
+    border-color 200ms,
+    transform 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+.supporter-top {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+}
+.supporter-avatar {
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #2b3551;
+  color: #d3dcff;
+}
+.supporter-person {
+  flex: 1;
+  min-width: 0;
+}
+.supporter-person h4 {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.supporter-person p {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.supporter-amount {
+  color: var(--accent);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.supporter-message {
+  border-top: 1px solid #303a50;
+  padding-top: 14px;
+  margin-top: 15px;
+  color: #c7cede;
+  font-size: 13px;
+  line-height: 2;
+  overflow-wrap: anywhere;
+}
+.supporters-state {
+  text-align: center;
+  border: 1px dashed #46516a;
+  border-radius: 16px;
+  padding: 32px 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.supporters-state > svg {
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.supporters-state > span {
+  display: block;
+  font-size: 12px;
+  margin-top: 8px;
+}
+.secondary-button {
+  padding: 11px 20px;
+  border: 1px solid #65728f;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #d3ddff;
+  background: #20283a;
+  transition: background 180ms;
+}
+.supporters-state button {
+  margin-top: 16px;
+}
+.load-more {
+  text-align: center;
+  margin-top: 24px;
+}
+.secondary-button:disabled {
+  cursor: wait;
+  color: var(--muted);
+}
+.spinner {
+  animation: spin 1s linear infinite;
+}
+button:focus-visible {
+  outline: 3px solid #d9e1ff;
+  outline-offset: 4px;
+}
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.notice-enter-active,
+.notice-leave-active {
+  transition:
+    opacity 200ms,
+    transform 200ms;
+}
+.notice-enter-from,
+.notice-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+@media (hover: hover) {
+  .amount-option:hover:not(:disabled) {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .payment-button:hover:not(:disabled) {
+    background: #ced7ff;
+    box-shadow: 0 8px 24px #050a184d;
+    transform: translateY(-2px);
+  }
+  .payment-button:hover .payment-arrow {
+    transform: translateX(-3px);
+  }
+  .supporter-card:hover {
+    border-color: #7483ab;
+    transform: translateY(-2px);
+  }
+  .secondary-button:hover:not(:disabled) {
+    background: #2d3851;
+  }
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes heart-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(14px) rotate(-16deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-9deg);
+  }
+}
+@keyframes orbit-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.85) rotate(-25deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 960px) {
+  .donation-layout {
+    gap: 36px;
+  }
+  .donation-form {
+    padding: 24px;
+  }
+  .donation-intro h2 {
+    font-size: 31px;
+  }
+  .amount-option strong {
+    font-size: 16px;
+  }
+}
+@media (max-width: 720px) {
+  .donation-section {
+    padding: 48px 18px;
+  }
+  .donation-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .donation-intro {
+    text-align: center;
+  }
+  .donation-intro h2 {
+    font-size: 32px;
+    line-height: 1.65;
+  }
+  .heart-art {
+    margin: 15px auto 2px;
+    width: 140px;
+    height: 125px;
+  }
+  .heart-orbit {
+    width: 120px;
+    height: 120px;
+  }
+  .orbit-two {
+    width: 96px;
+    height: 96px;
+  }
+  .heart-tile {
+    width: 68px;
+    height: 68px;
+    border-radius: 22px;
+    font-size: 27px;
+  }
+  .intro-copy {
+    margin: auto;
+    font-size: 14px;
+  }
+  .impact-list {
+    display: none;
+  }
+  .personal-note {
+    border: 0;
+    padding: 0;
+    margin-top: 16px;
+  }
+  .personal-note span {
+    display: inline;
+    margin-right: 8px;
+  }
+  .donation-form {
+    text-align: right;
+    padding: 24px 20px;
+    border-radius: 20px;
+  }
+  .supporters-section {
+    margin-top: 48px;
+    padding-top: 28px;
+  }
+  .supporters-heading {
+    display: block;
+  }
+  .supporters-heading h3 {
+    font-size: 20px;
+  }
+  .supporters-heading > p {
+    margin-top: 12px;
+  }
+  .supporters-grid {
+    grid-template-columns: 1fr;
+  }
+  .supporter-card {
+    padding: 18px;
+  }
+  .form-heading h3 {
+    font-size: 19px;
+  }
+}
+@media (max-width: 380px) {
+  .donation-section {
+    padding-inline: 12px;
+  }
+  .donation-form {
+    padding: 22px 16px;
+  }
+  .identity-fields {
+    grid-template-columns: 1fr;
+  }
+  .amount-options {
+    gap: 7px;
+  }
+  .amount-option strong {
+    font-size: 15px;
+  }
+  .donation-intro h2 {
+    font-size: 29px;
+  }
+  .supporter-top {
+    flex-wrap: wrap;
+  }
+  .supporter-amount {
+    margin-right: 50px;
+  }
+  .form-heading h3 {
+    font-size: 17px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .amount-option:hover,
+  .payment-button:hover,
+  .supporter-card:hover,
+  button:active:not(:disabled) {
+    transform: none !important;
+  }
+}
+</style>
