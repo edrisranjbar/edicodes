@@ -1,316 +1,696 @@
 <template>
-  <div>
-    <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
-      <h1 class="text-xl font-vazir text-white mb-4 md:mb-0">حمایت‌های مالی</h1>
-      
-      <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-reverse sm:space-x-2">
-        <div class="flex">
-          <select 
-            v-model="filters.status" 
-            @change="resetPageAndFetch"
-            class="bg-black/30 border border-white/10 text-white/80 text-sm rounded-lg px-2.5 py-1.5 font-vazir appearance-none"
-          >
+  <main class="donations-admin" dir="rtl" :aria-busy="loading">
+    <header class="page-heading">
+      <div>
+        <p class="eyebrow">همراهان مسیر</p>
+        <h1>حمایت‌های مالی</h1>
+        <p>پیگیری پرداخت‌ها، پیام حامیان و مدیریت نمایش عمومی</p>
+      </div>
+      <button class="button" :disabled="loading || updating !== null" @click="fetchDonations">
+        {{ loading ? 'در حال دریافت…' : 'به‌روزرسانی' }}
+      </button>
+    </header>
+    <section class="records-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>تراکنش‌ها</h2>
+          <p>جدیدترین حمایت‌ها در ابتدای فهرست نمایش داده می‌شوند.</p>
+        </div>
+        <span class="count">{{ loading || error ? '—' : number(pagination.total) }} نتیجه</span>
+      </div>
+      <form class="filters" @submit.prevent="applyFilters">
+        <div>
+          <label for="donation-status">وضعیت پرداخت</label
+          ><select id="donation-status" v-model="filters.status">
             <option value="all">همه وضعیت‌ها</option>
-            <option value="paid">پرداخت شده</option>
+            <option value="paid">پرداخت موفق</option>
             <option value="pending">در انتظار پرداخت</option>
-            <option value="failed">ناموفق</option>
+            <option value="failed">پرداخت ناموفق</option>
           </select>
         </div>
+        <div>
+          <label for="donation-from">از تاریخ (میلادی)</label
+          ><input
+            id="donation-from"
+            v-model="filters.start_date"
+            type="date"
+            :max="filters.end_date || undefined"
+          />
+        </div>
+        <div>
+          <label for="donation-to">تا تاریخ (میلادی)</label
+          ><input
+            id="donation-to"
+            v-model="filters.end_date"
+            type="date"
+            :min="filters.start_date || undefined"
+          />
+        </div>
+        <div>
+          <label for="donation-limit">تعداد در صفحه</label
+          ><select id="donation-limit" v-model="filters.per_page">
+            <option :value="10">۱۰</option>
+            <option :value="25">۲۵</option>
+            <option :value="50">۵۰</option>
+          </select>
+        </div>
+        <button class="button primary" :disabled="loading || updating !== null">اعمال فیلتر</button
+        ><button
+          type="button"
+          class="button"
+          :disabled="loading || updating !== null"
+          @click="resetFilters"
+        >
+          پاک کردن
+        </button>
+      </form>
+      <p
+        v-if="feedback"
+        class="feedback"
+        :class="{ danger: feedbackError }"
+        :role="feedbackError ? 'alert' : 'status'"
+      >
+        {{ feedback }}
+      </p>
+      <div v-if="loading" class="state" role="status">در حال دریافت حمایت‌ها…</div>
+      <div v-else-if="error" class="state danger" role="alert">
+        <p>{{ error }}</p>
+        <button class="button" @click="fetchDonations">تلاش دوباره</button>
       </div>
-    </div>
-
-    <!-- Donations Table -->
-    <div class="bg-black/30 rounded-lg border border-white/10 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-black/50">
-          <thead class="bg-black/50">
+      <div v-else-if="!donations.length" class="state">
+        <span class="empty-heart" aria-hidden="true">♡</span>
+        <h2>حمایتی پیدا نشد</h2>
+        <p>برای مشاهده نتایج دیگر، وضعیت یا بازه تاریخ را تغییر دهید.</p>
+      </div>
+      <div v-else class="table-scroll">
+        <table>
+          <thead>
             <tr>
-              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">نام</th>
-              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">ایمیل</th>
-              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">مبلغ</th>
-              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">وضعیت</th>
-              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">نمایش عمومی</th>
-              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">کد پیگیری</th>
-              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white/50 font-vazir">تاریخ</th>
+              <th>حامی</th>
+              <th>مبلغ حمایت</th>
+              <th>وضعیت پرداخت</th>
+              <th>نمایش عمومی</th>
+              <th>تاریخ ثبت</th>
+              <th>جزئیات</th>
             </tr>
           </thead>
-
-          <tbody class="divide-y divide-black/50 bg-black/20">
-            <!-- Loading state -->
-            <tr v-if="loading">
-              <td colspan="7" class="px-6 py-8">
-                <div class="flex justify-center">
-                  <div class="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-                </div>
-              </td>
-            </tr>
-
-            <!-- No results -->
-            <tr v-else-if="donations.length === 0">
-              <td colspan="7" class="px-6 py-8 text-center text-white/50 font-vazir">
-                حمایت مالی یافت نشد.
-              </td>
-            </tr>
-
-            <!-- Results -->
-            <tr v-for="(donation, index) in donations" :key="donation && donation.id ? donation.id : index" class="hover:bg-black/40 transition-colors duration-150">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white">
-                {{ (donation && donation.name) ? donation.name : 'ناشناس' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white/80">
-                {{ donation && donation.email ? donation.email : '-' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white font-bold">
-                {{ donation && donation.formatted_amount ? donation.formatted_amount : '-' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="{
-                  'px-2 py-1 text-xs rounded-md font-vazir': true,
-                  'bg-green-500/10 text-green-500': donation && donation.status === 'paid',
-                  'bg-yellow-500/10 text-yellow-500': donation && donation.status === 'pending',
-                  'bg-red-500/10 text-red-500': donation && donation.status === 'failed'
-                }">
-                  {{ donation && donation.status_in_persian ? donation.status_in_persian : '-' }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <button
-                  type="button"
-                  :disabled="visibilityUpdatingId === donation.id"
-                  :aria-pressed="donation.is_public"
-                  @click="toggleVisibility(donation)"
-                  :class="[
-                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:cursor-wait disabled:opacity-60',
-                    donation.is_public ? 'bg-green-500' : 'bg-white/20'
-                  ]"
-                  :title="donation.is_public ? 'خصوصی کردن حمایت' : 'عمومی کردن حمایت'"
-                >
-                  <span
-                    :class="[
-                      'inline-block h-4 w-4 rounded-full bg-white transition-transform',
-                      donation.is_public ? '-translate-x-6' : '-translate-x-1'
-                    ]"
-                  ></span>
-                </button>
-                <span class="mr-2 text-xs font-vazir" :class="donation.is_public ? 'text-green-400' : 'text-white/50'">
-                  {{ donation.is_public ? 'عمومی' : 'خصوصی' }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white/80">
-                {{ donation && donation.ref_id ? donation.ref_id : '-' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-vazir text-white/80">
-                {{ donation && donation.created_at ? formatDate(donation.created_at) : '-' }}
-              </td>
-            </tr>
+          <tbody>
+            <template v-for="donation in donations" :key="donation.id">
+              <tr :class="{ expanded: expanded === donation.id }">
+                <td>
+                  <div class="donor">
+                    <span class="avatar" aria-hidden="true">{{
+                      Array.from(donation.name || 'ناشناس')[0]
+                    }}</span>
+                    <div>
+                      <strong>{{ donation.name || 'ناشناس' }}</strong
+                      ><span class="email" dir="ltr">{{ donation.email || 'ایمیل ثبت نشده' }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="amount">
+                  {{ donation.formatted_amount || '—'
+                  }}<small>شناسه {{ number(donation.id) }}</small>
+                </td>
+                <td>
+                  <span class="badge" :class="donation.status"
+                    ><span aria-hidden="true">{{
+                      donation.status === 'paid' ? '✓' : donation.status === 'failed' ? '×' : '◷'
+                    }}</span>
+                    {{ statusLabel(donation) }}</span
+                  >
+                </td>
+                <td>
+                  <button
+                    class="visibility"
+                    :class="{ public: donation.is_public }"
+                    :disabled="updating !== null"
+                    :aria-pressed="!!donation.is_public"
+                    :aria-label="`${donation.is_public ? 'خصوصی کردن' : 'عمومی کردن'} حمایت ${donation.name || number(donation.id)}`"
+                    @click="toggleVisibility(donation)"
+                  >
+                    <font-awesome-icon :icon="donation.is_public ? 'eye' : 'lock'" />
+                    {{
+                      updating === donation.id
+                        ? 'در حال ذخیره…'
+                        : donation.is_public
+                          ? 'عمومی'
+                          : 'خصوصی'
+                    }}
+                  </button>
+                </td>
+                <td>{{ formatDate(donation.created_at) }}</td>
+                <td>
+                  <button
+                    class="details-button"
+                    :aria-expanded="expanded === donation.id"
+                    :aria-controls="`donation-detail-${donation.id}`"
+                    @click="expanded = expanded === donation.id ? null : donation.id"
+                  >
+                    {{ expanded === donation.id ? 'بستن' : 'مشاهده' }}
+                    <font-awesome-icon icon="chevron-down" />
+                  </button>
+                </td>
+              </tr>
+              <tr
+                v-if="expanded === donation.id"
+                :id="`donation-detail-${donation.id}`"
+                class="detail-row"
+              >
+                <td colspan="6">
+                  <div class="detail-content">
+                    <div>
+                      <h3>پیام حامی</h3>
+                      <p class="message">
+                        {{ donation.message || 'پیامی برای این حمایت ثبت نشده است.' }}
+                      </p>
+                    </div>
+                    <div>
+                      <h3>اطلاعات پرداخت</h3>
+                      <dl>
+                        <div>
+                          <dt>کد پیگیری</dt>
+                          <dd dir="ltr">
+                            {{ donation.ref_id || '—' }}
+                            <button
+                              v-if="donation.ref_id"
+                              class="copy-button"
+                              @click="copyReference(donation.ref_id)"
+                            >
+                              کپی
+                            </button>
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>روش پرداخت</dt>
+                          <dd>{{ donation.payment_method || '—' }}</dd>
+                        </div>
+                        <div>
+                          <dt>آخرین تغییر</dt>
+                          <dd>{{ formatDate(donation.updated_at) }}</dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
-    </div>
-
-    <!-- Pagination -->
-    <div v-if="!loading && pagination.last_page > 1" class="mt-6 flex justify-center">
-      <div class="flex items-center space-x-reverse space-x-1 rtl">
-        <button 
-          @click="changePage(1)" 
-          :disabled="pagination.current_page === 1"
-          :class="[
-            'px-2 py-1 rounded border font-vazir text-sm',
-            pagination.current_page === 1 
-              ? 'bg-black/20 text-white/40 border-white/5 cursor-not-allowed' 
-              : 'bg-black/30 hover:bg-black/40 text-white border-white/10'
-          ]"
+      <footer v-if="!loading && !error && donations.length" class="pagination">
+        <span
+          >{{ number((pagination.current_page - 1) * pagination.per_page + 1) }} تا
+          {{ number(Math.min(pagination.current_page * pagination.per_page, pagination.total)) }} از
+          {{ number(pagination.total) }} حمایت</span
         >
-          اولین
-        </button>
-
-        <button 
-          @click="changePage(pagination.current_page - 1)" 
-          :disabled="pagination.current_page === 1"
-          :class="[
-            'px-2 py-1 rounded border font-vazir text-sm',
-            pagination.current_page === 1 
-              ? 'bg-black/20 text-white/40 border-white/5 cursor-not-allowed' 
-              : 'bg-black/30 hover:bg-black/40 text-white border-white/10'
-          ]"
-        >
-          قبلی
-        </button>
-
-        <span class="text-white font-vazir text-sm">
-          صفحه {{ pagination.current_page }} از {{ pagination.last_page }}
-        </span>
-
-        <button 
-          @click="changePage(pagination.current_page + 1)" 
-          :disabled="pagination.current_page === pagination.last_page"
-          :class="[
-            'px-2 py-1 rounded border font-vazir text-sm',
-            pagination.current_page === pagination.last_page 
-              ? 'bg-black/20 text-white/40 border-white/5 cursor-not-allowed' 
-              : 'bg-black/30 hover:bg-black/40 text-white border-white/10'
-          ]"
-        >
-          بعدی
-        </button>
-
-        <button 
-          @click="changePage(pagination.last_page)" 
-          :disabled="pagination.current_page === pagination.last_page"
-          :class="[
-            'px-2 py-1 rounded border font-vazir text-sm',
-            pagination.current_page === pagination.last_page 
-              ? 'bg-black/20 text-white/40 border-white/5 cursor-not-allowed' 
-              : 'bg-black/30 hover:bg-black/40 text-white border-white/10'
-          ]"
-        >
-          آخرین
-        </button>
-      </div>
-    </div>
-  </div>
+        <div>
+          <button
+            class="button"
+            :disabled="pagination.current_page <= 1 || updating !== null"
+            @click="changePage(pagination.current_page - 1)"
+          >
+            قبلی</button
+          ><span
+            >صفحه {{ number(pagination.current_page) }} از {{ number(pagination.last_page) }}</span
+          ><button
+            class="button"
+            :disabled="pagination.current_page >= pagination.last_page || updating !== null"
+            @click="changePage(pagination.current_page + 1)"
+          >
+            بعدی
+          </button>
+        </div>
+      </footer>
+    </section>
+    <p class="privacy-note">
+      <font-awesome-icon icon="lock" /> نمایش عمومی مستقل از وضعیت پرداخت است. حمایت‌های موفق و
+      عمومی می‌توانند در فهرست حامیان سایت نمایش داده شوند.
+    </p>
+  </main>
 </template>
-
 <script setup>
-import { ref, onMounted, reactive, watch } from 'vue';
-import axios from 'axios';
-import { API_URL } from '@/config';
-
-// State
-const loading = ref(true);
-const visibilityUpdatingId = ref(null);
-const donations = ref([]);
-const pagination = reactive({
-  current_page: 1,
-  last_page: 1,
-  per_page: 10,
-  total: 0
-});
-
-const filters = reactive({
-  status: 'all',
-  per_page: 10
-});
-
-// Methods
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import axios from 'axios'
+import { API_URL } from '@/config'
+defineOptions({ name: 'AdminDonations' })
+const loading = ref(true)
+const updating = ref(null)
+const donations = ref([])
+const expanded = ref(null)
+const error = ref('')
+const feedback = ref('')
+const feedbackError = ref(false)
+const defaults = () => ({ status: 'all', start_date: '', end_date: '', per_page: 10 })
+const filters = reactive(defaults())
+let applied = defaults()
+const pagination = reactive({ current_page: 1, last_page: 1, per_page: 10, total: 0 })
+const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('admin_token')}` })
+const number = (value) => new Intl.NumberFormat('fa-IR').format(Number(value) || 0)
+const formatDate = (value) =>
+  value && !Number.isNaN(new Date(value).getTime())
+    ? new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium', timeStyle: 'short' }).format(
+        new Date(value),
+      )
+    : '—'
+const statusLabel = (donation) =>
+  ({ paid: 'پرداخت موفق', pending: 'در انتظار پرداخت', failed: 'پرداخت ناموفق' })[
+    donation.status
+  ] ||
+  donation.status_in_persian ||
+  'نامشخص'
+let controller
+let requestId = 0
 const fetchDonations = async () => {
+  controller?.abort()
+  controller = new AbortController()
+  const id = ++requestId
+  loading.value = true
+  error.value = ''
+  expanded.value = null
   try {
-    loading.value = true;
-    const token = localStorage.getItem('admin_token');
-    
-    const params = {
-      page: pagination.current_page,
-      per_page: filters.per_page,
-      status: filters.status,
-      sort: '-created_at'
-    };
-    
-    // API_URL already includes '/api', so we need to be careful not to duplicate it
-    const apiUrl = `${API_URL}/admin/donations`;
-    console.log('Fetching donations from:', apiUrl, params);
-    
-    const response = await axios.get(apiUrl, {
-      params,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    // Support both API shapes:
-    // A) { success, data: { current_page, data: [...] } }
-    // B) { current_page, data: [...] }
-    const body = response.data || {};
-    const paginated = body && body.data && typeof body.data === 'object' && !Array.isArray(body.data) && 'data' in body.data
-      ? body.data
-      : body;
-
-    const items = Array.isArray(paginated.data)
-      ? paginated.data
-      : Array.isArray(body.data)
-        ? body.data
-        : [];
-
-    donations.value = items.filter(Boolean);
-
-    // Update pagination safely
-    pagination.current_page = paginated.current_page || 1;
-    pagination.last_page = paginated.last_page || 1;
-    pagination.per_page = paginated.per_page || filters.per_page;
-    pagination.total = paginated.total || items.length;
-    
-  } catch (error) {
-    console.error('Error fetching donations:', error);
-    donations.value = [];
+    const response = await axios.get(`${API_URL}/admin/donations`, {
+      headers: headers(),
+      signal: controller.signal,
+      params: { ...applied, page: pagination.current_page, sort: '-created_at' },
+    })
+    if (id !== requestId) return
+    const body = response.data || {}
+    if (body.success === false) throw new Error('Request failed')
+    const data = body.data && !Array.isArray(body.data) && 'data' in body.data ? body.data : body
+    donations.value = (Array.isArray(data.data) ? data.data : []).filter(Boolean)
+    Object.assign(pagination, {
+      current_page: Number(data.current_page) || 1,
+      last_page: Number(data.last_page) || 1,
+      per_page: Number(data.per_page) || Number(applied.per_page),
+      total: Number(data.total) || donations.value.length,
+    })
+  } catch (err) {
+    if (id === requestId && !axios.isCancel(err))
+      error.value = 'دریافت حمایت‌ها ممکن نشد. دوباره تلاش کنید.'
   } finally {
-    loading.value = false;
+    if (id === requestId) loading.value = false
   }
-};
-
+}
+const applyFilters = () => {
+  applied = { ...filters }
+  pagination.current_page = 1
+  fetchDonations()
+}
+const resetFilters = () => {
+  Object.assign(filters, defaults())
+  applyFilters()
+}
 const changePage = (page) => {
-  if (page < 1 || page > pagination.last_page) return;
-  pagination.current_page = page;
-  fetchDonations();
-};
-
-const resetPageAndFetch = () => {
-  pagination.current_page = 1;
-  fetchDonations();
-};
-
+  if (loading.value || updating.value !== null || page < 1 || page > pagination.last_page) return
+  pagination.current_page = page
+  fetchDonations()
+}
 const toggleVisibility = async (donation) => {
-  if (!donation || visibilityUpdatingId.value !== null) return;
-
+  if (updating.value !== null) return
+  updating.value = donation.id
+  feedback.value = ''
+  feedbackError.value = false
+  const next = !donation.is_public
   try {
-    visibilityUpdatingId.value = donation.id;
-    const token = localStorage.getItem('admin_token');
-    const nextVisibility = !donation.is_public;
-
-    await axios.put(
+    const response = await axios.put(
       `${API_URL}/admin/donations/${donation.id}`,
-      { is_public: nextVisibility },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    donation.is_public = nextVisibility;
-  } catch (error) {
-    console.error('Error updating donation visibility:', error);
-    window.alert('تغییر وضعیت نمایش حمایت انجام نشد. لطفاً دوباره تلاش کنید.');
+      { is_public: next },
+      { headers: headers() },
+    )
+    if (response.data?.success === false) throw new Error('Update failed')
+    donation.is_public = response.data?.data?.is_public ?? next
+    feedback.value = `نمایش حمایت ${donation.name || number(donation.id)} به ${donation.is_public ? 'عمومی' : 'خصوصی'} تغییر کرد.`
+  } catch {
+    feedbackError.value = true
+    feedback.value = 'تغییر نمایش ذخیره نشد. وضعیت قبلی حفظ شد؛ دوباره تلاش کنید.'
   } finally {
-    visibilityUpdatingId.value = null;
+    updating.value = null
   }
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return '-';
-  const date = new Date(dateString);
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-
-  // Get the formatted date parts from Intl.DateTimeFormat
-  const formatter = new Intl.DateTimeFormat('fa-IR', options);
-  const parts = formatter.formatToParts(date);
-
-  // Extract the individual parts
-  let day = '';
-  let month = '';
-  let year = '';
-
-  parts.forEach(part => {
-    if (part.type === 'day') day = part.value;
-    if (part.type === 'month') month = part.value;
-    if (part.type === 'year') year = part.value;
-  });
-
-  // Format according to the required pattern: ۲۳ اردیبهشت ۱۴۰۴
-  return `${day} ${month} ${year}`;
-};
-
-// Watch for filter changes
-watch(filters, () => {
-  resetPageAndFetch();
-}, { deep: true });
-
-// Lifecycle hooks
-onMounted(() => {
-  fetchDonations();
-});
-</script> 
+}
+const copyReference = async (value) => {
+  try {
+    await navigator.clipboard.writeText(String(value))
+    feedbackError.value = false
+    feedback.value = 'کد پیگیری کپی شد.'
+  } catch {
+    feedbackError.value = true
+    feedback.value = 'کپی ممکن نشد. کد پیگیری را انتخاب و دستی کپی کنید.'
+  }
+}
+onMounted(fetchDonations)
+onBeforeUnmount(() => controller?.abort())
+</script>
+<style scoped>
+.donations-admin {
+  color: #f4f6fc;
+  max-width: 1440px;
+  margin: auto;
+}
+.page-heading,
+.panel-heading,
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.page-heading {
+  margin-bottom: 28px;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 6px 0 10px;
+}
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+.page-heading p,
+.panel-heading p,
+.privacy-note {
+  font-size: 13px;
+  color: #bdc8dd;
+  line-height: 1.9;
+}
+.page-heading .eyebrow {
+  color: #bbc9ff;
+  font-size: 12px;
+}
+.records-panel {
+  background: #161d2b;
+  border: 1px solid #3a465e;
+  border-radius: 18px;
+  overflow: hidden;
+}
+.panel-heading {
+  padding: 24px;
+}
+.panel-heading p {
+  margin-top: 6px;
+}
+.count {
+  color: #c6d2ff;
+  background: #b7c4ff12;
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  background: #121927;
+  padding: 20px 24px;
+  border-block: 1px solid #354159;
+}
+.filters > div {
+  flex: 1;
+  min-width: 145px;
+}
+label {
+  display: block;
+  font-size: 12px;
+  color: #cbd5e8;
+  margin-bottom: 8px;
+}
+select,
+input {
+  display: block;
+  width: 100%;
+  background: #1c2536;
+  border: 1px solid #65738e;
+  border-radius: 9px;
+  color: #f2f5fc;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 13px;
+  min-height: 42px;
+  color-scheme: dark;
+}
+.button {
+  background: #26324a;
+  border: 1px solid #63728f;
+  border-radius: 9px;
+  padding: 10px 15px;
+  font-size: 12px;
+  color: #e0e8fc;
+  min-height: 42px;
+}
+.button.primary {
+  background: #b7c4ff;
+  color: #18243f;
+  border-color: #b7c4ff;
+  font-weight: 700;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #c5d1ff;
+  outline-offset: 3px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+  white-space: nowrap;
+}
+th {
+  background: #192233;
+  color: #bdc9df;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 16px 20px;
+}
+td {
+  padding: 20px;
+  border-top: 1px solid #303c53;
+  font-size: 13px;
+}
+tbody tr:hover,
+tr.expanded {
+  background: #1b2639;
+}
+.donor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  background: #2d3a57;
+  color: #cedaff;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.donor strong {
+  display: block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+.email {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #b5c2d9;
+}
+.amount {
+  font-weight: 700;
+  color: #e0e7fc;
+}
+.amount small {
+  display: block;
+  font-weight: 400;
+  font-size: 11px;
+  color: #b5c2d9;
+  margin-top: 7px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #2b3547;
+  color: #d8e0ef;
+  border: 1px solid #59647a;
+  border-radius: 8px;
+  padding: 6px 9px;
+  font-size: 11px;
+}
+.badge.paid {
+  background: #18382f;
+  border-color: #3d7762;
+  color: #9bf1cf;
+}
+.badge.pending {
+  background: #39321d;
+  border-color: #807047;
+  color: #f4d889;
+}
+.badge.failed {
+  background: #3c2532;
+  border-color: #8b5064;
+  color: #ffc1d0;
+}
+.visibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #cbd5e7;
+  border: 1px solid #65738e;
+  background: #222d41;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+.visibility.public {
+  color: #a9edcf;
+  border-color: #548d73;
+  background: #1a352d;
+}
+.details-button {
+  color: #c1d0ff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.details-button[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+.detail-row {
+  background: #121b2b !important;
+}
+.detail-content {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 40px;
+  padding: 4px 12px 10px;
+  white-space: normal;
+}
+.detail-content h3 {
+  font-size: 13px;
+  color: #c5d2f2;
+  margin-bottom: 15px;
+}
+.message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 2;
+  color: #d1dbee;
+  font-size: 13px;
+}
+.detail-content dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+.detail-content dt {
+  color: #aebdd6;
+}
+.detail-content dd {
+  overflow-wrap: anywhere;
+}
+.copy-button {
+  color: #c4d2ff;
+  text-decoration: underline;
+  margin-inline: 8px;
+}
+.pagination {
+  padding: 20px 24px;
+  border-top: 1px solid #354159;
+  color: #bcc9de;
+  font-size: 12px;
+}
+.pagination > div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.privacy-note {
+  margin-top: 20px;
+}
+.privacy-note svg {
+  margin-left: 6px;
+  color: #b7c4ff;
+}
+.feedback {
+  margin: 16px 24px;
+  padding: 12px 16px;
+  border: 1px solid #548d73;
+  background: #1a352d;
+  color: #baf3d9;
+  border-radius: 9px;
+  font-size: 13px;
+}
+.danger {
+  color: #ffc4d0 !important;
+}
+.feedback.danger {
+  background: #3c2532;
+  border-color: #8b5064;
+}
+.state {
+  text-align: center;
+  padding: 60px 24px;
+  color: #c3cfe3;
+  font-size: 14px;
+}
+.state p {
+  margin: 12px 0;
+  line-height: 1.9;
+}
+.empty-heart {
+  display: block;
+  font-size: 36px;
+  color: #bdccff;
+  margin-bottom: 16px;
+}
+@media (max-width: 700px) {
+  .page-heading,
+  .panel-heading,
+  .pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .page-heading h1 {
+    font-size: 25px;
+  }
+  .panel-heading,
+  .filters,
+  .pagination {
+    padding: 18px;
+  }
+  .filters > div {
+    min-width: 130px;
+  }
+  .detail-content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .pagination > div {
+    gap: 10px;
+  }
+  .privacy-note {
+    font-size: 12px;
+  }
+}
+</style>
