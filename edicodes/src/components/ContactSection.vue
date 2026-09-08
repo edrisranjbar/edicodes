@@ -138,7 +138,7 @@
               <h3 class="text-primary font-semibold mb-2">در حال حاضر در دسترس</h3>
               <p class="text-white/70">
                 آماده همکاری به صورت فریلنسری، قراردادی یا تمام وقت هستم. بیایید با هم چیز فوق‌العاده‌ای بسازیم.
-                <a href="#donate" @click.prevent="scrollToDonate" class="text-primary hover:text-primary-dark transition-colors mr-1">
+                <a href="/donation" class="text-primary hover:text-primary-dark transition-colors mr-1">
                   از طریق حمایت مالی
                 </a>
                 از من پشتیبانی کنید.
@@ -273,13 +273,6 @@ const handleSubmit = async () => {
     error.value = 'متأسفانه در ارسال پیام خطایی رخ داد. لطفاً دوباره تلاش کنید.'
   } finally {
     isLoading.value = false
-  }
-}
-
-const scrollToDonate = () => {
-  const donateSection = document.querySelector('#donate')
-  if (donateSection) {
-    donateSection.scrollIntoView({ behavior: 'smooth' })
   }
 }
 </script> 

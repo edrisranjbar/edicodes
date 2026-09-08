@@ -6,20 +6,15 @@
     <ProjectsSection />
     <PhilosophySection />
     <BlogSection />
-    <YouTubeSection />
     <ContactSection />
-    <DonateSection />
   </div>
 </template>
 
 <script setup>
 import BlogSection from '@/components/BlogSection.vue'
-import YouTubeSection from '@/components/YouTubeSection.vue'
-import DonateSection from '@/components/DonateSection.vue'
 import HeroSection from '@/components/HeroSection.vue'
 import JourneySection from '@/components/JourneySection.vue'
 import PhilosophySection from '@/components/PhilosophySection.vue'
-import ExperienceSection from '@/components/ExperienceSection.vue'
 import ContactSection from '@/components/ContactSection.vue'
 import AboutMeSection from '@/components/AboutMeSection.vue'
 import ProjectsSection from '@/components/ProjectsSection.vue'
