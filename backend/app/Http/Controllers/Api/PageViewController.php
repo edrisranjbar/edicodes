@@ -66,27 +66,27 @@ class PageViewController extends Controller
                 $endDate = Carbon::today()->subSecond();
                 break;
             case 'week':
-                $startDate = Carbon::now()->subDays(7);
+                $startDate = Carbon::today()->subDays(6);
                 break;
             case 'month':
-                $startDate = Carbon::now()->subMonth();
+                $startDate = Carbon::today()->subDays(29);
                 break;
             case 'year':
-                $startDate = Carbon::now()->subYear();
+                $startDate = Carbon::today()->subDays(364);
                 break;
             case 'custom':
-                $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : Carbon::now()->subDays(7);
+                $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : Carbon::today()->subDays(6);
                 $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : Carbon::now();
                 break;
             default:
-                $startDate = Carbon::now()->subDays(7);
+                $startDate = Carbon::today()->subDays(6);
         }
         
         // Total views
         $totalViews = PageView::forPeriod($startDate, $endDate)->count();
         
         // Unique visitors
-        $uniqueVisitors = PageView::forPeriod($startDate, $endDate)->uniqueVisitorsCount();
+        $uniqueVisitors = PageView::forPeriod($startDate, $endDate)->distinct()->count('ip_address');
         
         // Daily views for chart
         $dailyViews = PageView::select(
@@ -95,16 +95,7 @@ class PageViewController extends Controller
                 DB::raw('COUNT(DISTINCT ip_address) as unique_visitors')
             )
             ->forPeriod($startDate, $endDate)
-            ->when($period === 'year', function($query) {
-                return $query->groupBy(DB::raw('MONTH(viewed_at)'))
-                    ->select(
-                        DB::raw('DATE_FORMAT(viewed_at, "%Y-%m-01") as date'),
-                        DB::raw('COUNT(*) as views'),
-                        DB::raw('COUNT(DISTINCT ip_address) as unique_visitors')
-                    );
-            }, function($query) {
-                return $query->groupBy(DB::raw('DATE(viewed_at)'));
-            })
+            ->groupBy(DB::raw('DATE(viewed_at)'))
             ->orderBy('date')
             ->get();
             
@@ -142,7 +133,16 @@ class PageViewController extends Controller
             'totalViews' => $totalViews,
             'uniqueVisitors' => $uniqueVisitors,
             'dailyViews' => $dailyViews,
-            'topPosts' => $topPosts,
+            // Post accessors calculate lifetime counts; preserve the period aggregates.
+            'topPosts' => $topPosts->map(function ($post) {
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'category' => $post->category,
+                    'views_count' => (int) $post->getRawOriginal('views_count'),
+                    'unique_visitors_count' => (int) $post->getRawOriginal('unique_visitors_count'),
+                ];
+            }),
             'topPages' => $topPages,
             'period' => [
                 'start' => $startDate->toDateString(),

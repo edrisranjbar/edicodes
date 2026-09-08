@@ -41,7 +41,7 @@ class DashboardController extends Controller
         $weekUniqueVisitors = PageView::forPeriod(Carbon::now()->subDays(7), Carbon::now())->uniqueVisitorsCount();
         
         // Get 3 most recent posts with their categories
-        $recentPosts = Post::with('category')
+        $recentPosts = Post::with('category')->withCount('pageViews')
             ->orderBy('created_at', 'desc')
             ->take(3)
             ->get();
@@ -76,4 +76,4 @@ class DashboardController extends Controller
             'topViewedPosts' => $topViewedPosts
         ]);
     }
-} 
+}
