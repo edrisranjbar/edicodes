@@ -1,15 +1,5 @@
 <template>
   <main class="donations-admin" dir="rtl" :aria-busy="loading">
-    <header class="page-heading">
-      <div>
-        <p class="eyebrow">همراهان مسیر</p>
-        <h1>حمایت‌های مالی</h1>
-        <p>پیگیری پرداخت‌ها، پیام حامیان و مدیریت نمایش عمومی</p>
-      </div>
-      <button class="button" :disabled="loading || updating !== null" @click="fetchDonations">
-        {{ loading ? 'در حال دریافت…' : 'به‌روزرسانی' }}
-      </button>
-    </header>
     <section class="records-panel">
       <div class="panel-heading">
         <div>
@@ -29,21 +19,29 @@
           </select>
         </div>
         <div>
-          <label for="donation-from">از تاریخ (میلادی)</label
+          <label for="donation-from">تاریخ شروع</label
           ><input
             id="donation-from"
             v-model="filters.start_date"
-            type="date"
-            :max="filters.end_date || undefined"
+            type="text"
+            dir="ltr"
+            placeholder="۱۴۰۵/۰۶/۱۷"
+            maxlength="10"
+            aria-describedby="jalali-help date-error"
+            :aria-invalid="!!dateError"
           />
         </div>
         <div>
-          <label for="donation-to">تا تاریخ (میلادی)</label
+          <label for="donation-to">تاریخ پایان</label
           ><input
             id="donation-to"
             v-model="filters.end_date"
-            type="date"
-            :min="filters.start_date || undefined"
+            type="text"
+            dir="ltr"
+            placeholder="۱۴۰۵/۰۶/۱۷"
+            maxlength="10"
+            aria-describedby="jalali-help date-error"
+            :aria-invalid="!!dateError"
           />
         </div>
         <div>
@@ -64,6 +62,8 @@
           پاک کردن
         </button>
       </form>
+      <p id="jalali-help" class="date-help">تاریخ شمسی با قالب سال/ماه/روز؛ مانند ۱۴۰۵/۰۶/۱۷</p>
+      <p v-if="dateError" id="date-error" class="feedback danger" role="alert">{{ dateError }}</p>
       <p
         v-if="feedback"
         class="feedback"
@@ -232,6 +232,7 @@
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
+import moment from 'moment-jalaali'
 import { API_URL } from '@/config'
 defineOptions({ name: 'AdminDonations' })
 const loading = ref(true)
@@ -239,6 +240,7 @@ const updating = ref(null)
 const donations = ref([])
 const expanded = ref(null)
 const error = ref('')
+const dateError = ref('')
 const feedback = ref('')
 const feedbackError = ref(false)
 const defaults = () => ({ status: 'all', start_date: '', end_date: '', per_page: 10 })
@@ -293,7 +295,34 @@ const fetchDonations = async () => {
   }
 }
 const applyFilters = () => {
-  applied = { ...filters }
+  dateError.value = ''
+  const parseDate = (value) => {
+    if (!value.trim()) return ''
+    const normalized = value
+      .trim()
+      .replace(/[۰-۹]/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit))
+      .replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit))
+    const parsed = moment(normalized, 'jYYYY/jMM/jDD', 'en', true)
+    if (
+      !/^\d{4}\/\d{2}\/\d{2}$/.test(normalized) ||
+      !parsed.isValid() ||
+      parsed.format('jYYYY/jMM/jDD') !== normalized
+    )
+      throw new Error('invalid date')
+    return parsed.format('YYYY-MM-DD')
+  }
+  try {
+    const start_date = parseDate(filters.start_date)
+    const end_date = parseDate(filters.end_date)
+    if (start_date && end_date && start_date > end_date) {
+      dateError.value = 'تاریخ پایان باید برابر یا بعد از تاریخ شروع باشد.'
+      return
+    }
+    applied = { ...filters, start_date, end_date }
+  } catch {
+    dateError.value = 'تاریخ شمسی معتبر با قالب ۱۴۰۵/۰۶/۱۷ وارد کنید.'
+    return
+  }
   pagination.current_page = 1
   fetchDonations()
 }
@@ -342,6 +371,11 @@ onMounted(fetchDonations)
 onBeforeUnmount(() => controller?.abort())
 </script>
 <style scoped>
+.date-help {
+  margin: 12px 24px;
+  color: #bdc8dd;
+  font-size: 12px;
+}
 .donations-admin {
   color: #f4f6fc;
   max-width: 1440px;
