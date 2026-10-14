@@ -40,23 +40,6 @@
                     کپی
                   </button>
                 </div>
-
-                <div class="contact-card group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-400/40 hover:bg-emerald-500/10">
-                  <a href="https://wa.me/989962933405" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 text-white">
-                    <div class="flex h-11 w-11 min-w-11 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
-                      <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current" aria-hidden="true">
-                        <path d="M12.04 2.5A9.49 9.49 0 0 0 3.03 11.74c0 1.67.44 3.3 1.28 4.74L2.5 21.5l5.16-1.35a9.46 9.46 0 0 0 4.38 1.03h.01c5.24 0 9.49-4.25 9.49-9.49S17.28 2.5 12.04 2.5Zm0 17.3h-.01a7.82 7.82 0 0 1-3.97-1.1l-.28-.17-3.06.8.82-2.98-.18-.29A7.81 7.81 0 1 1 12.04 19.8Zm4.34-5.83c-.24-.12-1.4-.69-1.62-.77-.22-.08-.38-.12-.54.12-.16.24-.62.77-.76.92-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.95-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.41-.54-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.86.84-.86 2.05 0 1.21.88 2.38.99 2.54.12.16 1.72 2.64 4.18 3.69.59.25 1.05.4 1.41.51.6.19 1.14.16 1.57.1.48-.07 1.4-.57 1.6-1.12.2-.55.2-1.02.14-1.12-.06-.1-.22-.16-.46-.28Z"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <p class="text-sm text-white/55">واتساپ</p>
-                      <p class="font-semibold text-white">+98 996 293 3405</p>
-                    </div>
-                  </a>
-                  <button @click.prevent="copyToClipboard('+989962933405', 'شماره واتساپ کپی شد')" class="absolute left-4 top-4 inline-flex items-center rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-white/70 opacity-0 transition-all duration-300 group-hover:opacity-100 hover:text-white">
-                    کپی
-                  </button>
-                </div>
               </div>
             </div>
           </div>

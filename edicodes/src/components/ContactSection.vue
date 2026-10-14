@@ -108,17 +108,6 @@
               </div>
               <div class="flex items-center gap-4">
                 <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
-                  <font-awesome-icon icon="phone" size="lg" />
-                </div>
-                <div>
-                  <h3 class="text-white/70 text-sm mb-1">تلفن</h3>
-                  <a href="tel:+989962933405" class="text-white hover:text-primary transition-colors" dir="ltr">
-                    +98 996 293 3405
-                  </a>
-                </div>
-              </div>
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
                   <font-awesome-icon icon="location-dot" size="lg" />
                 </div>
                 <div>
