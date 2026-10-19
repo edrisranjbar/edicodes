@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/build-study.cjs",
     "dev": "vite",
-    "build": "node generate-sitemap.js && vite build",
+    "build": "node scripts/build-study.cjs && node generate-sitemap.js && vite build",
+    "build:study": "node scripts/build-study.cjs",
+    "test:study": "node --test tests/study.test.js && node --test ../study/tests/course.test.cjs",
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",

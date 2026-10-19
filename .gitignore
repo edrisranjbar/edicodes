@@ -43,3 +43,14 @@ yarn-error.log*
 *.log
 .env.local
 .env.*.local
+
+# Study source is versioned; standalone and Vue payloads are generated locally.
+/study/index.html
+/study/plan.json
+/study/syllabus.json
+/study/intensive-plan.json
+/study/assets/styles.css
+/study/day-*/
+/study/chapters/
+/study/intensive/
+/edicodes/public/study-content/

@@ -26,6 +26,10 @@
             <font-awesome-icon icon="book" class="ml-1.5" />
             وبلاگ
           </router-link>
+          <router-link to="/study" class="nav-link" :class="{ active: $route.path.startsWith('/study') }">
+            <font-awesome-icon icon="graduation-cap" class="ml-1.5" />
+            مطالعه
+          </router-link>
           <!-- <router-link
             to="/courses"
             class="nav-link"
@@ -103,6 +107,10 @@
           <router-link to="/blog" class="mobile-nav-link" @click="isOpen = false">
             <font-awesome-icon icon="book" class="ml-2" />
             وبلاگ
+          </router-link>
+          <router-link to="/study" class="mobile-nav-link" @click="isOpen = false">
+            <font-awesome-icon icon="graduation-cap" class="ml-2" />
+            مطالعه
           </router-link>
           <router-link to="/courses" class="mobile-nav-link" @click="isOpen = false">
             <font-awesome-icon icon="graduation-cap" class="ml-2" />

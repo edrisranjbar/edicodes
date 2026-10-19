@@ -18,6 +18,12 @@ const router = createRouter({
       component: Contact,
     },
     {
+      path: '/study/:pathMatch(.*)*',
+      name: 'study',
+      component: () => import('@/views/Study.vue'),
+      meta: { study: true },
+    },
+    {
       path: '/donation',
       name: 'donation',
       component: () => import('@/views/Donate.vue'),
@@ -165,6 +171,7 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to, from, savedPosition) {
+    if (to.meta.study && to.hash) return false
     if (savedPosition) {
       return savedPosition
     } else if (to.hash) {

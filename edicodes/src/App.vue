@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-dark text-white font-vazir">
-    <Navbar v-if="!isAdminRoute" />
+    <Navbar v-if="!isAdminRoute && !isStudyRoute" />
     <router-view v-slot="{ Component }">
       <transition
         name="page"
@@ -12,8 +12,8 @@
         <component :is="Component" />
       </transition>
     </router-view>
-    <Footer v-if="!isAdminRoute" />
-    <TelegramBanner v-if="!isAdminRoute" />
+    <Footer v-if="!isAdminRoute && !isStudyRoute" />
+    <TelegramBanner v-if="!isAdminRoute && !isStudyRoute" />
   </div>
 </template>
 
@@ -25,6 +25,7 @@ import Footer from '@/components/Footer.vue'
 import TelegramBanner from '@/components/TelegramBanner.vue'
 
 const route = useRoute()
+const isStudyRoute = computed(() => route.meta.study === true)
 
 // Check if current route is an admin route
 const isAdminRoute = computed(() => {
@@ -37,13 +38,18 @@ const beforeLeave = (el) => {
 }
 
 const enter = (el) => {
+  if (el.classList.contains('study-page')) {
+    el.style.opacity = 1
+    el.style.transform = 'none'
+    return
+  }
   el.style.opacity = 0
   el.style.transform = 'translateX(-20px)'
 }
 
 const afterEnter = (el) => {
   el.style.opacity = 1
-  el.style.transform = 'translateX(0)'
+  el.style.transform = el.classList.contains('study-page') ? 'none' : 'translateX(0)'
 }
 
 onMounted(() => {

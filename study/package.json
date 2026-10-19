@@ -1,0 +1,10 @@
+{
+  "name": "discrete-math-with-python",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "test": "node --test tests/course.test.cjs",
+    "test:contrast": "node scripts/contrast.cjs"
+  }
+}
