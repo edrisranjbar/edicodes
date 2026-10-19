@@ -171,7 +171,8 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to, from, savedPosition) {
-    if (to.meta.study && to.hash) return false
+    // Study pages load asynchronously; Study.vue places the scroll once their content exists.
+    if (to.meta.study && (to.hash || savedPosition)) return false
     if (savedPosition) {
       return savedPosition
     } else if (to.hash) {

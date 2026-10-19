@@ -9,6 +9,8 @@ const output = path.join(frontend, 'public', 'study-content')
 const hash = data => crypto.createHash('sha256').update(data).digest('hex').slice(0, 16)
 const write = (file, data) => { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, data) }
 execFileSync(process.execPath, [path.join(source, 'scripts', 'build.cjs')], { stdio: 'inherit' })
+// Payload names are content-hashed, so clear the folder to keep superseded files out of the deploy.
+fs.rmSync(output, { recursive: true, force: true })
 const walk = folder => fs.readdirSync(folder, { withFileTypes: true }).flatMap(item => {
   const file = path.join(folder, item.name)
   return item.isDirectory() ? walk(file) : [file]
@@ -35,7 +37,8 @@ parsed.walkRules(rule => {
     return [`.study-root ${selector}`]
   })
 })
-css = parsed.toString() + '\n.study-root{min-height:100vh;direction:rtl} .study-root a{text-decoration:underline;text-underline-offset:4px} .study-root .chapter-sidebar a,.study-root .hero-action{text-decoration:none}\n'
+css = parsed.toString() + '\n.study-root{min-height:100vh;direction:rtl} .study-root a{text-decoration:underline;text-underline-offset:4px} .study-root .chapter-sidebar a,.study-root .hero-action{text-decoration:none}' +
+  ' .study-root .math.math-num{background:transparent;padding:0;margin-inline:1px;font-weight:bold;color:inherit} .study-root h1:focus{outline:none} .study-root td .math{white-space:nowrap;overflow-wrap:normal}\n'
 const cssName = `study.${hash(css)}.css`
 write(path.join(output, 'assets', cssName), css)
 const manifest = { version: 1, stylesheet: `/study-content/assets/${cssName}`, pages: {} }
@@ -57,6 +60,8 @@ for (const input of inputs) {
     if (resolved.startsWith('../')) throw new Error(`Link escapes course: ${relative}: ${href}`)
     return `href="${resolved.endsWith('.html') ? routeFor(resolved) : '/study-content/files/' + resolved}"`
   })
+  // Bare numbers read as prose; only symbolic expressions keep the boxed formula style.
+  markup = markup.replace(/<bdi class="math" dir="ltr">([۰-۹٪٫\s]+|[A-Za-z]{2,})<\/bdi>/g, '<bdi class="math math-num" dir="ltr">$1</bdi>')
   markup = markup.replace('<nav aria-label="مسیر صفحه">', '<nav aria-label="مسیر صفحه"><a href="/">EdiCodes</a><span aria-hidden="true">/</span>')
   const page = { title: html.match(/<title>(.*?)<\/title>/)[1], source: relative, html: markup, module: null }
   if (script) {
