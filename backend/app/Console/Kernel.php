@@ -21,15 +21,6 @@ class Kernel extends ConsoleKernel implements KernelContract
     ];
 
     /**
-     * Define the application's command schedule.
-     */
-    protected function schedule(\Illuminate\Console\Scheduling\Schedule $schedule): void
-    {
-        // Run every minute to pick up scheduled posts promptly
-        $schedule->command('posts:publish-scheduled')->everyMinute();
-    }
-
-    /**
      * Register the commands for the application.
      */
     protected function commands(): void
