@@ -1,7 +1,7 @@
 // Shared by generation and the browser: isolate complete mathematical expressions.
 function rich(text) {
   const escape = s => s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
-  const atom = String.raw`(?:\{(?:[^{}\n]|\{[^{}\n]*\})*\}|\|[^|\n]+\||[A-Za-z]+(?:\([^()\n]*\))?|\((?:[^()\n]|\([^()\n]*\))*\)|[۰-۹0-9]+(?:[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ]+)?|∅)`;
+  const atom = String.raw`(?:\{(?:[^{}\n]|\{[^{}\n]*\})*\}|\|[^|\n]+\||[A-Za-z]+(?:\([^()\n]*\))?|\((?:[^()\n]|\([^()\n]*\))*\)|[+\-−]?[۰-۹0-9]+(?:[٫.][۰-۹0-9]+)?(?:[eE][+\-−]?[۰-۹0-9]+)?(?:[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ]+)?|∅)`;
   const expression = new RegExp(String.raw`[\u0600-\u06ff]+\s*[∈∉]\s*[A-Za-z]+|` + atom + String.raw`(?:\s*[+−\-*/×÷=≠∈∉⊆∪∩△^≤≥<>]+\s*` + atom + ')*', 'g');
   let out='',start=0;
   for(const m of text.matchAll(expression)){

@@ -79,6 +79,8 @@ async function generateSitemap() {
       { url: '/blog', changefreq: 'daily', priority: 0.9 },
       { url: '/contact', changefreq: 'monthly', priority: 0.8 },
       { url: '/study', changefreq: 'weekly', priority: 0.8 },
+      { url: '/study/book', changefreq: 'weekly', priority: 0.8 },
+      ...Array.from({ length: 7 }, (_, i) => ({ url: `/study/book/chapter-${String(i + 1).padStart(2, '0')}`, changefreq: 'monthly', priority: 0.7 })),
       // { url: '/courses', changefreq: 'weekly', priority: 0.8 },
     ]
 

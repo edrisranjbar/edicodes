@@ -33,6 +33,9 @@ function audit(){
  for(const surface of ['selected','unselected'])add('متن نمودار روی '+surface,colors.diagramInk,colors[surface]);
  for(const color of ['teal','blue','purple','gray'])add('نوار نمودار '+color,colors[color],colors.track,3);
  add('نوار پیشرفت',colors.teal,colors.progressTrack,3);
+ add('عنوان انگلیسی کتاب روی سربرگ',colors.codeText,colors.hero);
+ add('متن سفید بخش اعتبارسنجی',colors.white,colors.blue);
+ add('متن سفید بخش آزمون',colors.white,colors.purple);
  return pairs;
 }
 module.exports={colors,css,audit};

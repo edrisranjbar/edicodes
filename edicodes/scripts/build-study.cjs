@@ -10,6 +10,7 @@ const hash = data => crypto.createHash('sha256').update(data).digest('hex').slic
 const write = (file, data) => { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, data) }
 execFileSync(process.execPath, [path.join(source, 'scripts', 'build.cjs')], { stdio: 'inherit' })
 // Payload names are content-hashed, so clear the folder to keep superseded files out of the deploy.
+if (output !== path.resolve(frontend, 'public', 'study-content') || (fs.existsSync(output) && fs.lstatSync(output).isSymbolicLink())) throw new Error('Unsafe generated output directory')
 fs.rmSync(output, { recursive: true, force: true })
 const walk = folder => fs.readdirSync(folder, { withFileTypes: true }).flatMap(item => {
   const file = path.join(folder, item.name)
@@ -17,6 +18,8 @@ const walk = folder => fs.readdirSync(folder, { withFileTypes: true }).flatMap(i
 })
 const inputs = [path.join(source, 'index.html')]
 for (const folder of ['chapters', 'intensive', ...Array.from({ length: 84 }, (_, i) => `day-${String(i + 1).padStart(2, '0')}`)]) inputs.push(...walk(path.join(source, folder)))
+inputs.push(path.join(source, 'book', 'index.html'))
+for (let i = 1; i <= 7; i++) inputs.push(...walk(path.join(source, 'book', `chapter-${String(i).padStart(2, '0')}`)))
 let css = fs.readFileSync(path.join(source, 'assets', 'styles.css'), 'utf8')
 const fontFiles = ['Vazir-Regular-FD.ttf', 'Vazir-Bold-FD.ttf', 'Morabba-Bold.ttf']
 let fontIndex = 0
@@ -56,9 +59,11 @@ for (const input of inputs) {
   let markup = body.replace(/<script>[\s\S]*?<\/script>/, '')
   markup = markup.replace(/href="([^\"]+)"/g, (match, href) => {
     if (/^(?:#|[a-z]+:|\/)/i.test(href)) return match
-    const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(relative), href))
+    const bare = href.split(/[?#]/, 1)[0]
+    const suffix = href.slice(bare.length)
+    const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(relative), bare))
     if (resolved.startsWith('../')) throw new Error(`Link escapes course: ${relative}: ${href}`)
-    return `href="${resolved.endsWith('.html') ? routeFor(resolved) : '/study-content/files/' + resolved}"`
+    return `href="${resolved.endsWith('.html') ? routeFor(resolved) + suffix : '/study-content/files/' + resolved + suffix}"`
   })
   // Bare numbers read as prose; only symbolic expressions keep the boxed formula style.
   markup = markup.replace(/<bdi class="math" dir="ltr">([۰-۹٪٫\s]+|[A-Za-z]{2,})<\/bdi>/g, '<bdi class="math math-num" dir="ltr">$1</bdi>')
@@ -74,6 +79,7 @@ for (const input of inputs) {
   write(path.join(output, 'pages', filename), JSON.stringify(page))
   manifest.pages[routeFor(relative)] = `/study-content/pages/${filename}`
 }
+manifest.book = JSON.parse(fs.readFileSync(path.join(source, 'book', 'catalog.json'), 'utf8'))
 manifest.revision = hash(JSON.stringify(manifest))
 write(path.join(output, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n')
 console.log(`Prepared ${Object.keys(manifest.pages).length} native Vue study pages (${manifest.revision})`)

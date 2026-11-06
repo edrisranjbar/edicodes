@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "node scripts/build-study.cjs && node generate-sitemap.js && vite build",
     "build:study": "node scripts/build-study.cjs",
-    "test:study": "node --test tests/study.test.js && node --test ../study/tests/course.test.cjs",
+    "test:study": "node --test tests/study.test.js && node --test ../study/tests/course.test.cjs ../study/tests/book.test.cjs",
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",

@@ -54,3 +54,6 @@ yarn-error.log*
 /study/chapters/
 /study/intensive/
 /edicodes/public/study-content/
+/study/book/index.html
+/study/book/catalog.json
+/study/book/chapter-*/

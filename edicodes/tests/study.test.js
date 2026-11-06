@@ -8,10 +8,13 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const output = path.join(root, 'public/study-content')
 const manifest = JSON.parse(fs.readFileSync(path.join(output, 'manifest.json'), 'utf8'))
 test('native Vue study bundle has every lesson, chapter and intensive-day page', () => {
-  assert.equal(Object.keys(manifest.pages).length, 45)
+  assert.equal(Object.keys(manifest.pages).length, 53)
   for (let d = 1; d <= 28; d++) assert.ok(manifest.pages[`/study/intensive/day-${String(d).padStart(2, '0')}`])
   assert.ok(manifest.pages['/study/day-01'])
   assert.ok(manifest.pages['/study/chapters/chapter-10'])
+  assert.ok(manifest.pages['/study/book'])
+  assert.equal(manifest.book.source.coverageByChapters, 50)
+  for(let chapter=1;chapter<=7;chapter++) assert.ok(manifest.pages[`/study/book/chapter-${String(chapter).padStart(2,'0')}`])
 })
 test('website navigation preserves local lesson links, hashes, downloads and external boundaries', () => {
   assert.equal(normalizeStudyPath('/study/index.html'), '/study')
@@ -28,9 +31,9 @@ test('every exported page link and runtime resolves to the same-origin payload',
     const page = JSON.parse(fs.readFileSync(path.join(root, 'public', url), 'utf8'))
     assert.ok(!/<script|<style/.test(page.html), route)
     for (const [, href] of page.html.matchAll(/href="([^\"]+)"/g)) {
-      if (href === '/' || href.startsWith('#')) continue
+      if (href === '/' || href.startsWith('#') || href.startsWith('data:text/plain;charset=utf-8,')) continue
       if (href.startsWith('/study-content/')) assert.ok(fs.existsSync(path.join(root, 'public', href)), href)
-      else assert.ok(manifest.pages[normalizeStudyPath(href)], `${route}: ${href}`)
+      else assert.ok(manifest.pages[normalizeStudyPath(new URL(href,'https://edrisranjbar.ir').pathname)], `${route}: ${href}`)
     }
     if (page.module) {
       const imported = await import(pathToFileURL(path.join(root, 'public', page.module)))
