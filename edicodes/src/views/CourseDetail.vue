@@ -258,10 +258,8 @@ const fetchCourse = async () => {
     loading.value = true;
     const slug = route.params.slug;
 
-    // For now, we'll fetch all courses and find the one with matching slug/id
-    const response = await courseService.getCourses();
-    const courses = response.data.data?.data || response.data.data || [];
-    course.value = courses.find(c => c.slug === slug || c.id.toString() === slug) || null;
+    const response = await courseService.getPublicCourse(slug);
+    course.value = response.data.data?.course || null;
 
     // If course is found, fetch its contents and check enrollment status
     if (course.value) {
@@ -278,7 +276,7 @@ const fetchCourse = async () => {
 
 const fetchCourseContents = async (courseId) => {
   try {
-    const response = await courseService.getCourseContents(courseId);
+    const response = await courseService.getPublicCourseContents(courseId);
     courseContents.value = response.data.data || [];
   } catch (error) {
     console.error('Error fetching course contents:', error);
@@ -512,7 +510,7 @@ const showTextContentModal = (content) => {
     <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
       <div class="p-6 border-b border-gray-700">
         <div class="flex items-center justify-between">
-          <h3 class="text-xl font-bold text-white font-vazir">${content.title}</h3>
+          <h3 class="text-xl font-bold text-white font-vazir" data-lesson-title></h3>
           <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -522,7 +520,7 @@ const showTextContentModal = (content) => {
       </div>
       <div class="p-6 overflow-y-auto max-h-[60vh]">
         <div class="prose prose-invert max-w-none">
-          <p class="text-gray-300 font-vazir leading-relaxed whitespace-pre-wrap">${content.content || 'محتوای متنی در دست توسعه است.'}</p>
+          <div class="text-gray-300 font-vazir leading-relaxed whitespace-pre-wrap break-words" data-lesson-text></div>
         </div>
       </div>
       <div class="p-6 border-t border-gray-700">
@@ -532,6 +530,24 @@ const showTextContentModal = (content) => {
       </div>
     </div>
   `;
+
+  modal.querySelector('[data-lesson-title]').textContent = content.title;
+  const body = modal.querySelector('[data-lesson-text]');
+  const text = content.content || 'محتوای متنی در دست توسعه است.';
+  let offset = 0;
+  for (const match of text.matchAll(/https:\/\/[^\s<>"']+/g)) {
+    body.appendChild(document.createTextNode(text.slice(offset, match.index)));
+    const link = document.createElement('a');
+    link.href = match[0];
+    link.textContent = match[0];
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.className = 'text-primary underline break-all';
+    link.dir = 'ltr';
+    body.appendChild(link);
+    offset = match.index + match[0].length;
+  }
+  body.appendChild(document.createTextNode(text.slice(offset)));
   
   document.body.appendChild(modal);
   

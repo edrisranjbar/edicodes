@@ -30,10 +30,12 @@ class CourseContentController extends Controller
      */
     public function store(Request $request, Course $course): JsonResponse
     {
+        abort_unless($request->user() instanceof \App\Models\Admin && $request->user()->is_active, 403);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'nullable|string',
-            'video' => 'required|file|mimes:mp4,avi,mov,wmv,flv,webm|max:204800', // 200MB max
+            'content' => 'required_without:video|nullable|string|max:60000',
+            'video' => 'required_without:content|nullable|file|mimes:mp4,avi,mov,wmv,flv,webm|max:204800', // 200MB max
             'order' => 'nullable|integer|min:0',
             'is_free' => 'nullable|boolean'
         ]);
@@ -57,7 +59,7 @@ class CourseContentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'ویدیو با موفقیت آپلود شد',
+            'message' => 'محتوای درس با موفقیت ایجاد شد',
             'data' => $content
         ], 201);
     }

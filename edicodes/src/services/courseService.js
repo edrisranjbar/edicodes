@@ -39,7 +39,7 @@ const courseService = {
    * Get all published courses (public)
    * @returns {Promise} - API response
    */
-  async getCourses() {
+  async getPublicCourses() {
     const instance = axios.create({
       baseURL: API_URL,
       headers: {
@@ -54,7 +54,7 @@ const courseService = {
    * @param {number|string} courseId - Course ID
    * @returns {Promise} - API response
    */
-  async getCourseContents(courseId) {
+  async getPublicCourseContents(courseId) {
     const instance = axios.create({
       baseURL: API_URL,
       headers: {
@@ -62,6 +62,12 @@ const courseService = {
       }
     });
     return instance.get(`/courses/${courseId}/contents`);
+  },
+
+  async getPublicCourse(slug) {
+    return axios.get(`${API_URL}/courses/slug/${encodeURIComponent(slug)}`, {
+      headers: { Accept: 'application/json' }
+    });
   },
 
   /**

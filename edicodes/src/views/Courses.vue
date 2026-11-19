@@ -154,7 +154,7 @@ const fetchCourses = async () => {
     loading.value = true;
     error.value = null;
 
-    const response = await courseService.getCourses();
+    const response = await courseService.getPublicCourses();
     console.log('Courses API response:', response.data);
 
     // Handle paginated response

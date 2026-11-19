@@ -63,8 +63,11 @@ class CourseController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        abort_unless($request->user() instanceof \App\Models\Admin && $request->user()->is_active, 403);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('courses', 'slug')],
             'description' => 'required|string',
             'short_description' => 'nullable|string|max:500',
             'price' => 'required|integer|min:0',
@@ -149,8 +152,11 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course): JsonResponse
     {
+        abort_unless($request->user() instanceof \App\Models\Admin && $request->user()->is_active, 403);
+
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
+            'slug' => ['sometimes', 'required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('courses', 'slug')->ignore($course->id)],
             'description' => 'sometimes|required|string',
             'short_description' => 'nullable|string|max:500',
             'price' => 'sometimes|required|integer|min:0',
@@ -361,8 +367,11 @@ class CourseController extends Controller
     private function processCourseData(array $data, Request $request): array
     {
         // Generate slug from title if present
-        if (isset($data['title'])) {
+        if (isset($data['title']) && empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']);
+            if ($data['slug'] === '') {
+                $data['slug'] = 'course-' . Str::uuid();
+            }
         }
 
         // Handle featured field conversion
