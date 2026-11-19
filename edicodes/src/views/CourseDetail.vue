@@ -83,7 +83,7 @@
                 <div class="text-sm text-gray-400 font-vazir">دانشجو</div>
               </div>
               <div class="text-center">
-                <div class="text-2xl font-bold text-white">{{ course.contents_count || 0 }}</div>
+                <div class="text-2xl font-bold text-white">{{ course.contents_count ?? courseContents.length }}</div>
                 <div class="text-sm text-gray-400 font-vazir">درس</div>
               </div>
               <div class="text-center">
@@ -459,7 +459,7 @@ const viewContent = async (content) => {
   const adminToken = localStorage.getItem('admin_token');
   const userToken = localStorage.getItem('user_token');
 
-  if (!adminToken && !userToken) {
+  if (!adminToken && !userToken && !content.is_free) {
     alert('لطفا ابتدا وارد حساب کاربری خود شوید.');
     return;
   }
