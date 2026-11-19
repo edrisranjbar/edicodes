@@ -1,5 +1,14 @@
 import DOMPurify from 'dompurify';
 
+// Restore the source lesson's visual declarations, without executable CSS,
+// remote resources, fixed positioning or styles that can affect the site shell.
+const lessonStyleProperties = new Set([
+  'color', 'background', 'background-color', 'border', 'border-color', 'border-bottom', 'border-radius',
+  'padding', 'padding-bottom', 'margin', 'margin-top', 'margin-bottom', 'font-size', 'font-weight', 'font-family',
+  'line-height', 'text-align', 'vertical-align', 'direction', 'display', 'align-items', 'justify-content',
+  'gap', 'flex', 'flex-wrap', 'flex-shrink', 'width', 'min-width', 'max-width', 'height', 'overflow-x', 'border-collapse',
+]);
+
 export function sanitizeLessonHtml(html) {
   const clean = DOMPurify.sanitize(html || '', {
     ADD_TAGS: ['iframe'],
@@ -8,6 +17,19 @@ export function sanitizeLessonHtml(html) {
     FORBID_ATTR: ['style', 'srcdoc'],
   });
   const doc = new DOMParser().parseFromString(clean, 'text/html');
+  for (const element of doc.querySelectorAll('[data-lesson-style]')) {
+    for (const declaration of element.dataset.lessonStyle.split(';')) {
+      const colon = declaration.indexOf(':');
+      if (colon < 1) continue;
+      const property = declaration.slice(0, colon).trim().toLowerCase();
+      const value = declaration.slice(colon + 1).trim();
+      if (lessonStyleProperties.has(property) && /^[\w\s#().,%+\-/"']+$/.test(value)
+          && !/url\s*\(|expression|javascript|behavior|!important/i.test(value)) {
+        element.style.setProperty(property, value);
+      }
+    }
+    element.removeAttribute('data-lesson-style');
+  }
   for (const frame of doc.querySelectorAll('iframe')) {
     let url;
     try { url = new URL(frame.getAttribute('src')); } catch { frame.remove(); continue; }

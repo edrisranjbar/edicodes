@@ -7,6 +7,10 @@ if (!source) throw new Error('Pass the python-course source directory');
 const base = fs.readFileSync(path.join(source, 'assets/css/style.css'), 'utf8');
 const variables = base.match(/:root\s*\{([^}]+)\}/)[1];
 const css = postcss.parse(fs.readFileSync(path.join(source, 'assets/css/lesson.css'), 'utf8'));
+const baseStyles = postcss.parse(base);
+baseStyles.walkRules(rule => {
+  if (rule.selectors.every(selector => /^\.token-[\w-]+$/.test(selector) || selector === '.no-border')) css.append(rule.clone());
+});
 css.walkRules(rule => {
   if (rule.parent.type === 'atrule' && /keyframes$/.test(rule.parent.name)) return;
   rule.selectors = rule.selectors.map(selector => `.lesson-html ${selector}`);
@@ -29,11 +33,6 @@ const overrides = `
 .lesson-html .code-block, .lesson-html .hint-body, .lesson-html .quiz-card, .lesson-html .quiz-option { min-width:0; max-width:100%; }
 .lesson-html .code-block pre { margin:0; }
 .lesson-html button { cursor:pointer; }
-.lesson-html .token-keyword { color:#c4b5fd; }
-.lesson-html .token-string { color:#86efac; }
-.lesson-html .token-comment { color:#94a3b8; }
-.lesson-html .token-function { color:#7dd3fc; }
-.lesson-html .token-number { color:#fbbf24; }
 @media (max-width:640px) {
   .lesson-html .lesson-section { padding:1rem; }
   .lesson-html .lesson-title { font-size:1.6rem; }

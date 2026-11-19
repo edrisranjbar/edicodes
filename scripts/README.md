@@ -4,6 +4,11 @@ Lessons have dedicated pages at `/courses/:slug/lessons/:order`. HTML bodies ret
 headings, paragraphs, highlighted code, tables, approved video embeds, quizzes,
 exercise hints, and references. HTML is sanitized in the reader; imported scripts
 and inline event handlers are never executed. Plain-text lessons remain supported.
+The reader has a sticky course sidebar, previous/next navigation, and manual
+completion tracking saved separately for each course in the current browser.
+Progress counts completed lesson IDs, not visits, and does not sync to an account.
+Original typography, code colors and safe visual inline declarations are restored
+inside the article; imported positioning and remote CSS resources are excluded.
 
 ## Deploy
 

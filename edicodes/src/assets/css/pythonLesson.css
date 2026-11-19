@@ -1029,6 +1029,38 @@
   }
 }
 
+.lesson-html .no-border {
+  border: unset !important;
+}
+
+.lesson-html .token-keyword {
+  color: #ff7b72;
+}
+
+.lesson-html .token-function {
+  color: #d2a8ff;
+}
+
+.lesson-html .token-string {
+  color: #a5d6ff;
+}
+
+.lesson-html .token-comment {
+  color: #8b949e;
+}
+
+.lesson-html .token-number {
+  color: #79c0ff;
+}
+
+.lesson-html .token-class {
+  color: var(--python-yellow);
+}
+
+.lesson-html .token-text {
+  color: var(--text-primary);
+}
+
 .lesson-html {
   --bg-primary: #0a0e1a;
   --bg-secondary: #0f1628;
@@ -1069,11 +1101,6 @@
 .lesson-html .code-block, .lesson-html .hint-body, .lesson-html .quiz-card, .lesson-html .quiz-option { min-width:0; max-width:100%; }
 .lesson-html .code-block pre { margin:0; }
 .lesson-html button { cursor:pointer; }
-.lesson-html .token-keyword { color:#c4b5fd; }
-.lesson-html .token-string { color:#86efac; }
-.lesson-html .token-comment { color:#94a3b8; }
-.lesson-html .token-function { color:#7dd3fc; }
-.lesson-html .token-number { color:#fbbf24; }
 @media (max-width:640px) {
   .lesson-html .lesson-section { padding:1rem; }
   .lesson-html .lesson-title { font-size:1.6rem; }

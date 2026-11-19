@@ -91,13 +91,14 @@ class ImportTests(unittest.TestCase):
 
     def test_html_extraction_keeps_structure_and_quiz_data_without_scripts(self):
         parser = LessonHtml()
-        parser.feed('<nav>outside</nav><main><h1>Python</h1><p><strong>Learn</strong></p>'
+        parser.feed('<nav>outside</nav><main><h1>Python</h1><p style="color: red"><strong>Learn</strong></p>'
                     '<pre><code>if x:\n    print(&quot;&lt;x&gt;&quot;)</code></pre>'
                     '<label data-correct="1"><input type="radio" name="q1">Yes</label>'
                     '<button onclick="copyCode(this)">Copy</button><script>bad()</script>'
                     '<iframe src="https://www.youtube.com/embed/VIDEO_ID"></iframe></main>')
         html = parser.html()
         self.assertIn('<strong>Learn</strong>', html)
+        self.assertIn('data-lesson-style="color: red"', html)
         self.assertIn('    print(&quot;&lt;x&gt;&quot;)', html)
         self.assertIn('data-correct="1"', html)
         self.assertIn('data-action="copy"', html)

@@ -94,6 +94,8 @@ class LessonHtml(HTMLParser):
                 kept[key] = value
         if 'copyCode' in attrs.get('onclick', ''):
             kept['data-action'] = 'copy'
+        if attrs.get('style'):
+            kept['data-lesson-style'] = attrs['style']
         self.parts.append('<' + tag + ''.join(' ' + k + ('' if v is None else '="' + escape(v, quote=True) + '"') for k, v in kept.items()) + '>')
         if tag == 'pre':
             self.pre += 1
