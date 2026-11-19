@@ -34,7 +34,8 @@ class CourseContentController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required_without:video|nullable|string|max:60000',
+            'content' => 'required_without:video|nullable|string|max:1000000',
+            'content_format' => ['sometimes', Rule::in(['text', 'html'])],
             'video' => 'required_without:content|nullable|file|mimes:mp4,avi,mov,wmv,flv,webm|max:204800', // 200MB max
             'order' => 'nullable|integer|min:0',
             'is_free' => 'nullable|boolean'
@@ -88,6 +89,7 @@ class CourseContentController extends Controller
      */
     public function update(Request $request, Course $course, CourseContent $content): JsonResponse
     {
+        abort_unless($request->user() instanceof \App\Models\Admin && $request->user()->is_active, 403);
         // Verify content belongs to course
         if ($content->course_id !== $course->id) {
             return response()->json([
@@ -96,20 +98,10 @@ class CourseContentController extends Controller
             ], 404);
         }
 
-        // Debug logging
-        \Log::info('Update content called', [
-            'request_method' => $request->method(),
-            'has_video' => $request->hasFile('video'),
-            'has_video_alt' => $request->file('video') !== null,
-            'files' => $request->file(),
-            'all_data' => $request->all(),
-            'content_type' => $request->header('Content-Type'),
-            'file_exists' => $request->hasFile('video') ? 'yes' : 'no'
-        ]);
-
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
-            'content' => 'nullable|string',
+            'content' => 'nullable|string|max:1000000',
+            'content_format' => ['sometimes', Rule::in(['text', 'html'])],
             'video' => 'nullable|file|mimes:mp4,avi,mov,wmv,flv,webm|max:204800', // 200MB max
             'order' => 'nullable|integer|min:0',
             'is_free' => 'nullable|boolean'

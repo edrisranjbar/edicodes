@@ -1,8 +1,10 @@
 import contextlib
 import io
 import unittest
+import tempfile
+from pathlib import Path
 
-from import_python_course import LessonText, import_course
+from import_python_course import LessonText, LessonHtml, import_course
 
 
 class FakeApi:
@@ -23,6 +25,10 @@ class FakeApi:
             if method == 'POST':
                 self.lessons.append(dict(data))
             return {'data': self.lessons}
+        if '/contents/' in path and method == 'PUT':
+            lesson_id = int(path.rsplit('/', 1)[1])
+            next(item for item in self.lessons if item['id'] == lesson_id).update(data)
+            return {'data': data}
         if method == 'PUT':
             self.published = True
             self.course.update(data)
@@ -57,6 +63,20 @@ class ImportTests(unittest.TestCase):
             import_course(api, self.payload(), True)
         self.assertFalse(api.published)
 
+    def test_html_replacement_backs_up_originals_and_keeps_lesson_ids(self):
+        api = FakeApi()
+        api.course = {'id': 7, 'slug': 'python-programming'}
+        api.lessons = [dict(item, id=item['order'] + 100, content='old text') for item in self.payload()['lessons']]
+        with tempfile.TemporaryDirectory() as directory, contextlib.redirect_stdout(io.StringIO()):
+            backup = Path(directory) / 'before.json'
+            import_course(api, self.payload(), True, True, backup)
+            self.assertIn('old text', backup.read_text())
+            self.assertTrue(api.published)
+            self.assertEqual(api.lessons[0]['id'], 101)
+            self.assertEqual(api.lessons[0]['content'], 'text')
+            with self.assertRaises(ValueError):
+                import_course(api, self.payload(), True, True, backup)
+
     def test_text_extraction_preserves_code_and_omits_placeholder_media(self):
         parser = LessonText()
         parser.feed('<nav>outside</nav><main><h1>Title</h1><pre>if x:\n    print(&quot;&lt;x&gt;&quot;)</pre>'
@@ -68,6 +88,21 @@ class ImportTests(unittest.TestCase):
         self.assertIn('https://youtube.com/embed/realvideo', text)
         for unwanted in ['outside', 'Copy', 'bad()', 'VIDEO_ID']:
             self.assertNotIn(unwanted, text)
+
+    def test_html_extraction_keeps_structure_and_quiz_data_without_scripts(self):
+        parser = LessonHtml()
+        parser.feed('<nav>outside</nav><main><h1>Python</h1><p><strong>Learn</strong></p>'
+                    '<pre><code>if x:\n    print(&quot;&lt;x&gt;&quot;)</code></pre>'
+                    '<label data-correct="1"><input type="radio" name="q1">Yes</label>'
+                    '<button onclick="copyCode(this)">Copy</button><script>bad()</script>'
+                    '<iframe src="https://www.youtube.com/embed/VIDEO_ID"></iframe></main>')
+        html = parser.html()
+        self.assertIn('<strong>Learn</strong>', html)
+        self.assertIn('    print(&quot;&lt;x&gt;&quot;)', html)
+        self.assertIn('data-correct="1"', html)
+        self.assertIn('data-action="copy"', html)
+        for unwanted in ['onclick', 'bad()', '<script', 'VIDEO_ID', 'outside']:
+            self.assertNotIn(unwanted, html)
 
 
 if __name__ == '__main__':

@@ -70,6 +70,15 @@ const courseService = {
     });
   },
 
+  async getAccessibleLesson(courseId, contentId) {
+    const userToken = localStorage.getItem('user_token');
+    const adminToken = localStorage.getItem('admin_token');
+    const prefix = adminToken && !userToken ? '/admin' : '';
+    return axios.get(`${API_URL}${prefix}/courses/${courseId}/contents/${contentId}`, {
+      headers: { Accept: 'application/json', Authorization: `Bearer ${userToken || adminToken || ''}` }
+    });
+  },
+
   /**
    * Get all courses (admin)
    * @param {number} page - Page number for pagination

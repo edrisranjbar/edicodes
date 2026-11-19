@@ -14,6 +14,7 @@ class CourseContent extends Model
         'title',
         'description',
         'content',
+        'content_format',
         'video_path',
         'video_url',
         'video_duration',

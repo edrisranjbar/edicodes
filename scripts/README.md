@@ -1,39 +1,64 @@
 # Python course API import
 
-The Laravel API accepts text-only lessons at `POST /api/admin/courses/{id}/contents`.
-Send `title`, `content`, `order`, and `is_free` as JSON with an active admin's
-Bearer token. Existing multipart video uploads still work. A lesson needs either
-nonempty text or a video. Course creation also accepts a unique ASCII `slug`.
+Lessons have dedicated pages at `/courses/:slug/lessons/:order`. HTML bodies retain
+headings, paragraphs, highlighted code, tables, approved video embeds, quizzes,
+exercise hints, and references. HTML is sanitized in the reader; imported scripts
+and inline event handlers are never executed. Plain-text lessons remain supported.
 
-After pulling the backend update on the server, no migrations are needed.
-Deploy/rebuild the Vue frontend as usual to get safe plain-text lesson display
-and clickable HTTPS video/reference links. Lesson text is intentionally plain
-text, preserving code indentation; interactive quizzes remain on the original
-course site.
+## Deploy
 
-Prepare a reviewable payload locally (requires Python 3.10+ and PHP on PATH):
+Pull `master`, then run in the backend directory:
 
-```powershell
-python scripts/import_python_course.py --source C:/Users/edi/Desktop/python-course --output C:/Users/edi/Desktop/python-course-import.json
+```bash
+php artisan migrate --force
 ```
 
-Import through the deployed API and publish after all 37 lessons are verified:
+The migration expands lesson storage and adds `content_format` (`text` by default,
+`html` for rich lessons). Install frontend dependencies and rebuild/deploy its
+`dist` directory as usual:
 
-```powershell
-python scripts/import_python_course.py --source C:/Users/edi/Desktop/python-course --output C:/Users/edi/Desktop/python-course-import.json --token-file C:/Users/edi/Desktop/edrisranjbar_apikey.txt --apply --publish
+```bash
+cd edicodes
+npm ci
+npm run build
 ```
 
-The token stays in its local file and is never written to the payload. An import
-resumes by course slug and lesson order, skips exact matches, and refuses
-conflicting existing lessons. On interruption, rerun the same command. New courses
-stay in draft until every lesson matches the API readback. Placeholder video URLs
-are excluded; existing videos are linked rather than downloaded or reuploaded.
+## Prepare and import
 
-Verification:
+Python 3.10+ and PHP must be on PATH. Prepare a reviewable HTML payload locally:
+
+```powershell
+python scripts/import_python_course.py --source C:/Users/edi/Desktop/python-course --output C:/Users/edi/Desktop/python-course-html-import.json
+```
+
+Replace the previously imported plain-text bodies through the deployed API while
+keeping lesson IDs, order, course identity and enrollment. The backup path must
+not exist; it preserves all existing lesson records before any update:
+
+```powershell
+python scripts/import_python_course.py --source C:/Users/edi/Desktop/python-course --output C:/Users/edi/Desktop/python-course-html-import.json --token-file C:/Users/edi/Desktop/edrisranjbar_apikey.txt --apply --publish --update-existing --backup C:/Users/edi/Desktop/python-course-before-html.json
+```
+
+For a new course, omit `--update-existing` and `--backup`. Authenticated imports
+require HTTPS. Tokens are read from the local file and never saved to payloads or
+backups. Exact matches are skipped; duplicate titles/orders or conflicting lessons
+are rejected unless replacement is explicitly requested. The final readback must
+match all 37 lesson records before the importer reports success.
+
+The reader preserves video tabs, code-copy buttons, quiz grading and native
+expandable exercise hints. Placeholder video URLs are excluded. Styling is adapted
+from the original course and scoped to the lesson article so it cannot affect
+other site pages. To regenerate it after source CSS changes:
+
+```powershell
+node scripts/build-python-lesson-css.cjs C:/Users/edi/Desktop/python-course
+```
+
+## Verify
 
 ```powershell
 python -m unittest discover -s scripts -p "test_*.py"
-node --test edicodes/tests/course-service.test.cjs
+node --test edicodes/tests/course-access.test.cjs edicodes/tests/course-service.test.cjs
 cd backend
 php artisan test --filter=CourseImportApiTest
 ```

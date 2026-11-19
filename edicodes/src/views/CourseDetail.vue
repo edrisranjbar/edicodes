@@ -171,7 +171,7 @@
 
                 <!-- Content description -->
                 <p v-if="content.content" class="text-gray-300 text-sm font-vazir line-clamp-2 [overflow-wrap:anywhere]">
-                  {{ content.content }}
+                  {{ lessonPreview(content) }}
                 </p>
               </div>
 
@@ -424,6 +424,12 @@ const enrollInCourse = async () => {
   }
 };
 
+const lessonPreview = (content) => {
+  if (content.content_format !== 'html') return content.content;
+  const doc = new DOMParser().parseFromString(content.content || '', 'text/html');
+  return doc.querySelector('.lesson-lead, .lesson-header p, p')?.textContent || '';
+};
+
 const viewContent = async (content) => {
   if (!course.value) return;
 
@@ -448,87 +454,13 @@ const viewContent = async (content) => {
   try {
     contentLoading.value = true;
 
-    // Determine content type based on available fields
-    if (content.video_path) {
-      // Video content
-      const baseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace('/api', '');
-      const videoUrl = `${baseUrl}/storage/${content.video_path}`;
-      window.open(videoUrl, '_blank');
-    } else if (content.file_path) {
-      // File content
-      const baseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace('/api', '');
-      const fileUrl = `${baseUrl}/storage/${content.file_path}`;
-      window.open(fileUrl, '_blank');
-    } else if (content.content) {
-      // Text content
-      showTextContentModal(content);
-    } else {
-      // No content available
-      alert(`محتوای "${content.title}" هنوز آماده نیست. لطفا بعدا امتحان کنید.`);
-    }
+    await router.push({ name: 'course-lesson', params: { slug: course.value.slug, order: content.order } });
   } catch (error) {
     console.error('Error accessing content:', error);
     alert('خطا در دسترسی به محتوا. لطفا دوباره امتحان کنید.');
   } finally {
     contentLoading.value = false;
   }
-};
-
-const showTextContentModal = (content) => {
-  // Create a modal-like overlay for text content
-  const modal = document.createElement('div');
-  modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
-  modal.innerHTML = `
-    <div class="bg-gray-800 rounded-lg min-w-0 max-w-2xl w-full max-h-[80vh] overflow-hidden" dir="rtl">
-      <div class="p-6 border-b border-gray-700">
-        <div class="flex items-center justify-between gap-3">
-          <h3 class="min-w-0 text-xl font-bold text-white font-vazir [overflow-wrap:anywhere]" data-lesson-title></h3>
-          <button onclick="this.closest('.fixed').remove()" class="shrink-0 text-gray-400 hover:text-white" aria-label="بستن">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div class="p-6 overflow-y-auto max-h-[60vh]">
-        <div class="prose prose-invert max-w-none">
-          <div class="min-w-0 text-gray-300 font-vazir leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]" data-lesson-text></div>
-        </div>
-      </div>
-      <div class="p-6 border-t border-gray-700">
-        <button onclick="this.closest('.fixed').remove()" class="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200 font-vazir">
-          بستن
-        </button>
-      </div>
-    </div>
-  `;
-
-  modal.querySelector('[data-lesson-title]').textContent = content.title;
-  const body = modal.querySelector('[data-lesson-text]');
-  const text = content.content || 'محتوای متنی در دست توسعه است.';
-  let offset = 0;
-  for (const match of text.matchAll(/https:\/\/[^\s<>"']+/g)) {
-    body.appendChild(document.createTextNode(text.slice(offset, match.index)));
-    const link = document.createElement('a');
-    link.href = match[0];
-    link.textContent = match[0];
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.className = 'text-primary underline break-all';
-    link.dir = 'ltr';
-    body.appendChild(link);
-    offset = match.index + match[0].length;
-  }
-  body.appendChild(document.createTextNode(text.slice(offset)));
-  
-  document.body.appendChild(modal);
-  
-  // Close modal when clicking outside
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.remove();
-    }
-  });
 };
 
 // Lifecycle

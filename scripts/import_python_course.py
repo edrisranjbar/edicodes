@@ -6,6 +6,7 @@ import subprocess
 import urllib.error
 import urllib.request
 from html.parser import HTMLParser
+from html import escape
 from pathlib import Path
 
 
@@ -58,6 +59,67 @@ class LessonText(HTMLParser):
         return re.sub(r'\n[ \t]*\n(?:[ \t]*\n)+', '\n\n', ''.join(self.parts)).strip()
 
 
+class LessonHtml(HTMLParser):
+    """Keep lesson markup and interaction data, without executing imported scripts."""
+    void = {'br', 'hr', 'img', 'input', 'meta', 'link', 'source', 'wbr', 'area', 'embed'}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack = []
+        self.parts = []
+        self.pre = 0
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        active = tag == 'main' or any(t == 'main' for t, _, _ in self.stack)
+        skip = (self.stack[-1][1] if self.stack else False) or tag in {'script', 'style', 'svg', 'nav'} or any(
+            c in attrs.get('class', '').split() for c in ['lesson-nav-btns', 'breadcrumb']
+        )
+        url = attrs.get('href', attrs.get('src', ''))
+        if re.search(r'VIDEO_ID|APARAT_HASH|YOUR_|PLACEHOLDER', url, re.I):
+            skip = True
+        emit = active and not skip and tag != 'main'
+        if tag not in self.void:
+            self.stack.append((tag, skip, emit))
+        if not emit:
+            return
+        kept = {}
+        for key, value in attrs.items():
+            if key in {'class', 'id', 'dir', 'title', 'href', 'src', 'target', 'rel', 'type', 'name', 'value', 'allowfullscreen', 'frameborder', 'checked', 'open'} or key.startswith('data-'):
+                if key in {'href', 'src'}:
+                    if value.startswith(('javascript:', 'data:', 'http:')):
+                        continue
+                    if re.fullmatch(r'\d+\.php', value):
+                        value = '/courses/python-programming/lessons/' + value[:-4]
+                kept[key] = value
+        if 'copyCode' in attrs.get('onclick', ''):
+            kept['data-action'] = 'copy'
+        self.parts.append('<' + tag + ''.join(' ' + k + ('' if v is None else '="' + escape(v, quote=True) + '"') for k, v in kept.items()) + '>')
+        if tag == 'pre':
+            self.pre += 1
+
+    def handle_endtag(self, tag):
+        for i in range(len(self.stack) - 1, -1, -1):
+            if self.stack[i][0] == tag:
+                _, _, emit = self.stack[i]
+                if emit:
+                    self.parts.append('</' + tag + '>')
+                    if tag == 'pre':
+                        self.pre = max(0, self.pre - 1)
+                del self.stack[i:]
+                break
+
+    def handle_data(self, data):
+        if self.stack and not self.stack[-1][1] and any(t == 'main' for t, _, _ in self.stack):
+            self.parts.append(escape(data if self.pre else re.sub(r'\s+', ' ', data)))
+
+    def html(self):
+        html = ''.join(self.parts).strip()
+        html = re.sub(r'<section\b[^>]*\bid="videos"[^>]*>.*?</section>',
+                      lambda match: match[0] if '<iframe' in match[0] else '', html, flags=re.S)
+        return '<div class="lesson-main">' + html + '</div>'
+
+
 def build_payload(source):
     lessons = []
     for number in range(1, 38):
@@ -70,14 +132,13 @@ def build_payload(source):
                                 cwd=source, capture_output=True, check=True)
         if result.stderr.strip():
             raise ValueError(f'PHP warnings in lesson {number}: {result.stderr.decode("utf-8")}')
-        parser = LessonText()
+        parser = LessonHtml()
         parser.feed(result.stdout.decode('utf-8'))
-        text = parser.text()
-        if len(text) < 200 or len(text.encode('utf-8')) > 65000:
+        text = parser.html()
+        if len(text) < 200 or len(text) > 1000000:
             raise ValueError(f'Unexpected lesson size: {number} ({len(text.encode("utf-8"))} bytes)')
-        text += f'\n\nنسخه اصلی و تعاملی درس:\nhttps://python.edii.ir/{number}.php'
         lessons.append({'title': f'{number}. {title[2]}', 'content': text,
-                        'order': number, 'is_free': True})
+                        'content_format': 'html', 'order': number, 'is_free': True})
     return {'course': {
         'title': 'آموزش رایگان پایتون از صفر تا پروژه', 'slug': 'python-programming',
         'description': 'دوره رایگان و فارسی پایتون با ادریس رنجبر در ۳۷ درس، از نصب و مبانی برنامه‌نویسی تا کار با داده، ساخت وب‌اپلیکیشن و ربات تلگرام. شامل متن آموزشی، مثال، تمرین و لینک ویدیوهای موجود.',
@@ -103,7 +164,7 @@ class Api:
             raise RuntimeError(f'{method} {path}: HTTP {error.code}: {error.read().decode()[:1000]}') from None
 
 
-def import_course(api, payload, publish):
+def import_course(api, payload, publish, update_existing=False, backup_path=None):
     profile = api.call('GET', '/admin/profile')['admin']
     courses, page = [], 1
     while True:
@@ -124,13 +185,22 @@ def import_course(api, payload, publish):
     course_id = course['id']
     path = f'/admin/courses/{course_id}/contents'
     existing = api.call('GET', path)['data']
+    if update_existing:
+        if not backup_path:
+            raise ValueError('Updating existing lessons requires a backup path')
+        backup_path = Path(backup_path)
+        if backup_path.exists():
+            raise ValueError('Backup file already exists; choose a new path to preserve the original')
+        backup_path.write_text(json.dumps({'course': course, 'lessons': existing}, ensure_ascii=False, indent=2), encoding='utf-8')
     for lesson in payload['lessons']:
         matches = [c for c in existing if c['order'] == lesson['order']]
         if len(matches) > 1 or (matches and matches[0]['title'] != lesson['title']):
             raise ValueError(f'Conflicting lesson at order {lesson["order"]}; refusing to overwrite')
         if matches:
             if any(matches[0].get(k) != v for k, v in lesson.items()):
-                raise ValueError(f'Existing lesson {lesson["order"]} differs; review before updating')
+                if not update_existing:
+                    raise ValueError(f'Existing lesson {lesson["order"]} differs; review before updating')
+                api.call('PUT', path + '/' + str(matches[0]['id']), lesson)
         else:
             api.call('POST', path, lesson)
         print(f'Verified lesson {lesson["order"]}/37')
@@ -155,6 +225,8 @@ def main():
     parser.add_argument('--token-file', type=Path)
     parser.add_argument('--apply', action='store_true')
     parser.add_argument('--publish', action='store_true')
+    parser.add_argument('--update-existing', action='store_true', help='Replace matching lesson bodies, keeping IDs and enrollment')
+    parser.add_argument('--backup', type=Path, help='New JSON backup file required when replacing existing lessons')
     args = parser.parse_args()
     payload = build_payload(args.source.resolve())
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -166,7 +238,7 @@ def main():
         if not args.api_base.startswith('https://'):
             parser.error('Authenticated imports require HTTPS')
         token = args.token_file.read_text(encoding='utf-8-sig').strip().removeprefix('Bearer ')
-        import_course(Api(args.api_base, token), payload, args.publish)
+        import_course(Api(args.api_base, token), payload, args.publish, args.update_existing, args.backup)
 
 
 if __name__ == '__main__':

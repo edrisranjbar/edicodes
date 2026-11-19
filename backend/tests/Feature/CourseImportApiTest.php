@@ -44,6 +44,18 @@ class CourseImportApiTest extends TestCase
             ->assertUnprocessable()->assertJsonValidationErrors(['content', 'video']);
     }
 
+    public function test_large_html_lessons_can_replace_plain_text_and_round_trip(): void
+    {
+        $course = $this->course();
+        $lesson = $course->contents()->create(['title' => 'HTML lesson', 'content' => 'Old text', 'order' => 1, 'is_free' => true]);
+        $html = '<article><h1>Python</h1><pre><code>' . str_repeat('print("hello")' . "\n", 6000) . '</code></pre></article>';
+        $this->putJson("/api/admin/courses/{$course->id}/contents/{$lesson->id}", [
+            'content' => $html, 'content_format' => 'html',
+        ])->assertOk()->assertJsonPath('data.content_format', 'html')->assertJsonPath('data.content', $html);
+        $this->assertSame($lesson->id, $course->contents()->first()->id);
+        $this->assertSame($html, $lesson->fresh()->content);
+    }
+
     public function test_video_only_uploads_still_work(): void
     {
         Storage::fake('public');
