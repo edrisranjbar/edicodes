@@ -38,9 +38,9 @@
           </div>
 
           <!-- Course Info -->
-          <div class="md:w-2/3 p-8">
-            <div class="flex items-start justify-between mb-4">
-              <div>
+          <div class="md:w-2/3 min-w-0 p-5 sm:p-8">
+            <div class="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
+              <div class="min-w-0 [overflow-wrap:anywhere]">
                 <h1 class="text-3xl font-bold text-white mb-2 font-vazir">{{ course.title }}</h1>
 
                 <!-- Course Status and Featured Badges -->
@@ -128,7 +128,7 @@
       </div>
 
       <!-- Course Description -->
-      <div class="bg-black/50 border border-white/10 rounded-lg p-8 mb-8">
+      <div class="bg-black/50 border border-white/10 rounded-lg p-4 sm:p-8 mb-8">
         <h2 class="text-2xl font-bold text-white mb-6 font-vazir">توضیحات دوره</h2>
         <div class="prose prose-invert max-w-none">
           <p class="text-gray-300 font-vazir leading-relaxed">{{ course.description }}</p>
@@ -136,7 +136,7 @@
       </div>
 
       <!-- Course Contents -->
-      <div class="bg-black/50 border border-white/10 rounded-lg p-8">
+      <div class="bg-black/50 border border-white/10 rounded-lg p-4 sm:p-8">
         <h2 class="text-2xl font-bold text-white mb-6 font-vazir">محتوای دوره</h2>
 
         <!-- Contents List -->
@@ -146,7 +146,7 @@
             :key="content.id"
             class="bg-black/30 border border-white/10 rounded-lg p-4 hover:bg-black/40 transition-all duration-200"
           >
-            <div class="flex items-center space-x-4 space-x-reverse">
+            <div class="grid grid-cols-[auto_minmax(0,1fr)] sm:grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-4">
               <!-- Content Type Icon -->
               <div class="flex-shrink-0">
                 <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
@@ -158,9 +158,9 @@
               </div>
 
               <!-- Content Info -->
-              <div class="flex-1">
-                <div class="flex items-center space-x-2 space-x-reverse mb-2">
-                  <h3 class="text-lg font-medium text-white font-vazir">{{ content.title }}</h3>
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  <h3 class="min-w-0 text-lg font-medium text-white font-vazir [overflow-wrap:anywhere]">{{ content.title }}</h3>
                   <span
                     v-if="content.is_free"
                     class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full font-vazir"
@@ -169,29 +169,19 @@
                   </span>
                 </div>
 
-                <div class="flex items-center space-x-4 space-x-reverse text-sm text-gray-400 mb-2">
-                  <span class="font-vazir">{{ getContentTypeLabel(content) }}</span>
-                  <span class="font-vazir">ترتیب: {{ content.order }}</span>
-
-                  <!-- Video duration for video content -->
-                  <span v-if="content.video_path && content.video_duration" class="font-vazir">
-                    {{ formatDuration(content.video_duration) }}
-                  </span>
-                </div>
-
                 <!-- Content description -->
-                <p v-if="content.content" class="text-gray-300 text-sm font-vazir line-clamp-2">
+                <p v-if="content.content" class="text-gray-300 text-sm font-vazir line-clamp-2 [overflow-wrap:anywhere]">
                   {{ content.content }}
                 </p>
               </div>
 
               <!-- Play Button -->
-              <div class="flex-shrink-0">
+              <div class="col-span-2 sm:col-span-1 min-w-0">
                 <button
                   @click="viewContent(content)"
                   :disabled="contentLoading"
                   :class="[
-                    'px-4 py-2 rounded-lg transition-colors duration-200 font-vazir text-sm',
+                    'w-full sm:w-auto px-4 py-2 rounded-lg transition-colors duration-200 font-vazir text-sm',
                     (isEnrolled || content.is_free)
                       ? 'bg-primary text-white hover:bg-primary/90'
                       : 'bg-gray-500 text-gray-300 cursor-not-allowed'
@@ -380,17 +370,6 @@ const getContentTypeIcon = (content) => {
   }
 };
 
-const getContentTypeLabel = (content) => {
-  // Determine content type based on available fields
-  if (content.video_path) {
-    return 'ویدیو';
-  } else if (content.file_path) {
-    return 'فایل';
-  } else {
-    return 'متن'; // Default to text for content without video/file
-  }
-};
-
 const enrollInCourse = async () => {
   if (!course.value) return;
 
@@ -443,13 +422,6 @@ const enrollInCourse = async () => {
   } finally {
     enrollmentLoading.value = false;
   }
-};
-
-const formatDuration = (seconds) => {
-  if (!seconds) return '0:00';
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
 const viewContent = async (content) => {
@@ -507,11 +479,11 @@ const showTextContentModal = (content) => {
   const modal = document.createElement('div');
   modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
   modal.innerHTML = `
-    <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
+    <div class="bg-gray-800 rounded-lg min-w-0 max-w-2xl w-full max-h-[80vh] overflow-hidden" dir="rtl">
       <div class="p-6 border-b border-gray-700">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xl font-bold text-white font-vazir" data-lesson-title></h3>
-          <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white">
+        <div class="flex items-center justify-between gap-3">
+          <h3 class="min-w-0 text-xl font-bold text-white font-vazir [overflow-wrap:anywhere]" data-lesson-title></h3>
+          <button onclick="this.closest('.fixed').remove()" class="shrink-0 text-gray-400 hover:text-white" aria-label="بستن">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -520,7 +492,7 @@ const showTextContentModal = (content) => {
       </div>
       <div class="p-6 overflow-y-auto max-h-[60vh]">
         <div class="prose prose-invert max-w-none">
-          <div class="text-gray-300 font-vazir leading-relaxed whitespace-pre-wrap break-words" data-lesson-text></div>
+          <div class="min-w-0 text-gray-300 font-vazir leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]" data-lesson-text></div>
         </div>
       </div>
       <div class="p-6 border-t border-gray-700">
